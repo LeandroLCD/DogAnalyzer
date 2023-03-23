@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">Dogedex</string>
     <string name="female">Female</string>
     <string name="weight">Weight</string>
@@ -20,21 +20,4 @@
     <string name="email_is_not_valid">El Email no es valido</string>
     <string name="password_is_not_valid">La contraseña es requerida</string>
     <string name="passwords_do_not_matcn">Las contraseñas no coinciden</string>
-    <string name="msjPermission">El usuario nego el permiso de la cámara.</string>
-    <string name="messageCamera">Para poder tomar las fotos de tus Dog favoritos debes concederme el permiso para acceder a la camara.</string>
-    <string name="OK">OK</string>
-    <string name="Cancelar">Cancelar</string>
-    <string name="TAG">dogedex</string>
-    <string name="add_photo">add Photo</string>
-    <string name="dog_list">Dog list</string>
-    <string name="setting">Button Setting</string>
-    <string name="dog_image">Dog Image</string>
-    <string name="logout">Logout</string>
-    <string name="title_activity_dog_detail_compose">DogDetailComposeActivity</string>
-    <string name="error_dialog_confirButton">Reintentar</string>
-    <string name="error_dialog_title">Error</string>
-    <string name="title_activity_dog_list_compose">DogListComposeActivity</string>
-    <string name="title_top_bar">My Collection Dog</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="server_client_id" tools:ignore="TypographyDashes">920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com</string>
 </resources>

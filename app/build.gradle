@@ -1,17 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs'
-
-    //region Dependency Injection 'dagger hilt'
-    id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
-    // endregion
-
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
-
 
 }
 
@@ -27,37 +19,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
-    }
-
-    signingConfigs {
-        debug {
-            storeFile file('D:/leandrocolmenarez.jks')
-            storePassword '26829625-5'
-            keyAlias 'keyLcd'
-            keyPassword '26829625-5'
-        }
-        release {
-            storeFile file('D:/leandrocolmenarez.jks')
-            storePassword '26829625-5'
-            keyAlias 'keyLcd'
-            keyPassword '26829625-5'
-        }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            debuggable false
-            signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
             minifyEnabled false
-            debuggable true
-            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -69,15 +36,6 @@ android {
     }
     buildFeatures{
         dataBinding true
-        compose true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.2.0'
-    }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
     }
 }
 
@@ -87,94 +45,28 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0'
 
-
+    //navegar entre fragment
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
+    implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
 
     // dowload image
-    implementation "io.coil-kt:coil:2.3.0"
-    implementation "io.coil-kt:coil-gif:2.2.2"
-
+    implementation "io.coil-kt:coil:2.2.2"
     //libreria de iconos
-    implementation 'androidx.compose.material:material:1.4.2'
-    implementation "androidx.compose.material:material-icons-extended:1.4.2"
+    implementation 'androidx.compose.material:material:1.3.1'
+    implementation "androidx.compose.material:material-icons-extended:1.3.1"
 
-    //async and viewModel
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    //Programaciòn async y viewModel
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
 
-    //region Animation
-    implementation "com.airbnb.android:lottie-compose:4.0.0"
-    //endregion
-
-    //region retrofit
+    //region retrofit libreria para el consumo de apis
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    //endregion
+//endregion
 
-    //region CameraX
-    implementation "androidx.camera:camera-lifecycle:$cameraxVersion"
-    implementation "androidx.camera:camera-view:$cameraxVersion"
-    implementation "androidx.camera:camera-extensions:1.3.0-alpha05"
-
-    //endregion
-
-    //region Jetpack Compose
-    def composeBom = platform('androidx.compose:compose-bom:2023.01.00')
-    implementation composeBom
-    androidTestImplementation composeBom
-
-
-    implementation "androidx.navigation:navigation-compose:2.5.3"
-    implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
-
-    implementation 'androidx.compose.material3:material3'
-
-    implementation 'androidx.compose.material:material'
-
-    implementation 'androidx.compose.foundation:foundation'
-
-    implementation 'androidx.compose.ui:ui'
-
-
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    debugImplementation 'androidx.compose.ui:ui-tooling'
-    // Optional - Integration with activities
-    implementation 'androidx.activity:activity-compose:1.7.1'
-
-    // UI Tests
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-    debugImplementation 'androidx.compose.ui:ui-test-manifest'
-
-    // Optional - Integration with LiveData
-    implementation 'androidx.compose.runtime:runtime-livedata'
-    // Optional - Integration with RxJava
-    implementation 'androidx.compose.runtime:runtime-rxjava2'
-
-    implementation("io.coil-kt:coil-compose:2.3.0")
-    //endregion
-
-    //region TensorFlow Lite
-    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOP'
-    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
-
-    //endregion
-
-    //region Firebase
-    implementation platform('com.google.firebase:firebase-bom:31.3.0')
-    implementation 'com.google.firebase:firebase-firestore-ktx'
-    implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
-    //endregion
-
-    //region Dependency Injection 'dagger hilt' Implementations
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-compiler:2.44"
-    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
-    // endregion
-
-    implementation 'androidx.activity:activity-ktx:1.7.1'
+    implementation 'androidx.activity:activity-ktx:1.6.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
