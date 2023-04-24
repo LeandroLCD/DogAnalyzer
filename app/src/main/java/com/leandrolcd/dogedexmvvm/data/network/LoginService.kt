@@ -27,6 +27,6 @@ class LoginService @Inject constructor( private val firebaseAuth: FirebaseAuth
 
 
     fun signOut() {
-        firebaseAuth.signOut()
+       firebaseAuth.signOut()
     }
 }

@@ -231,7 +231,6 @@ fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
     }
 
 }
-
 @Composable
 fun MyFab(imageVector: ImageVector = Icons.Default.Check, onClicked: () -> Unit) {
     FloatingActionButton(
@@ -242,7 +241,6 @@ fun MyFab(imageVector: ImageVector = Icons.Default.Check, onClicked: () -> Unit)
         Icon(imageVector = imageVector, contentDescription = null)
     }
 }
-
 @Composable
 fun MyTopAppBar(
     navController: NavHostController,
@@ -272,7 +270,6 @@ fun MyTopAppBar(
 
     }
 }
-
 @Composable
 fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
     val currentLocale = LocalConfiguration.current.locales[0]
@@ -323,7 +320,6 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
     }
 
 }
-
 @Composable
 fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
 
@@ -375,7 +371,6 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
     }
 
 }
-
 @Composable
 fun DogCuriosities(textEn: String, textSp: String, modifier: Modifier = Modifier) {
 
@@ -435,7 +430,6 @@ fun DogCuriosities(textEn: String, textSp: String, modifier: Modifier = Modifier
         }
     }
 }
-
 @Composable
 fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
     Surface(
@@ -482,7 +476,7 @@ private fun TextTitle(
     textSp: String,
     textEn: String,
     fontSize: TextUnit = 16.sp,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
     textColor: Color = Color.Black
 ) {
@@ -537,8 +531,6 @@ fun DogImage(imageUrl: String, modifier: Modifier) {
         modifier = modifier.fillMaxWidth()
     )
 }
-
-
 @Composable
 fun DogDetail(dog: Dog, index: Int) {
     ConstraintLayout(
@@ -576,7 +568,6 @@ fun DogDetail(dog: Dog, index: Int) {
 
     }
 }
-
 @Composable
 fun ColumnDetail(dog: Dog, modifier: Modifier = Modifier) {
     Column(
@@ -623,7 +614,6 @@ fun ColumnDetail(dog: Dog, modifier: Modifier = Modifier) {
 
     }
 }
-
 @Composable
 fun IconBarra(modifier: Modifier = Modifier) {
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.electrocardiography))

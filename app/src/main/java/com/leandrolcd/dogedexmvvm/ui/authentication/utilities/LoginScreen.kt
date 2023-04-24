@@ -67,6 +67,7 @@ fun LoginScreen(
             LaunchedEffect(true) {
                 navigationController.popBackStack()
                 navigationController.navigate(Routes.ScreenDogList.route)
+                viewModel.onTryAgain()
             }
         }
     }

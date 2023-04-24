@@ -34,6 +34,10 @@ class LoginRepository @Inject constructor(private val loginService: LoginService
         return loginService.getUser()
     }
 
+    fun logout(){
+        loginService.signOut()
+    }
+
     suspend fun authLoginWithGoogle(idToken: String): UiStatus<Any> =
         suspendCancellableCoroutine { continuation ->
             loginService.signInWithGoogle(idToken)

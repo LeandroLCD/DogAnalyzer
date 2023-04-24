@@ -17,4 +17,8 @@ class AuthLoginUseCase @Inject constructor(
         return repository.getUser()
     }
 
+    fun logout(){
+        repository.logout()
+    }
+
 }

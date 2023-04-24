@@ -1,7 +1,7 @@
 package com.leandrolcd.dogedexmvvm.data.repositoty
 
 import android.content.Context
-import com.leandrolcd.dogedexmvvm.api.makeNetworkCall
+import com.leandrolcd.dogedexmvvm.core.makeNetworkCall
 import com.leandrolcd.dogedexmvvm.data.model.DogDTO
 import com.leandrolcd.dogedexmvvm.data.network.FireStoreService
 import com.leandrolcd.dogedexmvvm.isNetworkConnected

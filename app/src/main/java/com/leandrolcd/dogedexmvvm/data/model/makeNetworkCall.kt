@@ -1,6 +1,7 @@
 package com.leandrolcd.dogedexmvvm.api
 
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.UnknownHostException

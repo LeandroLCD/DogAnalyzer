@@ -20,4 +20,5 @@
     <string name="email_is_not_valid">El Email no es valido</string>
     <string name="password_is_not_valid">La contraseña es requerida</string>
     <string name="passwords_do_not_matcn">Las contraseñas no coinciden</string>
+    <string name="server_client_id">920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com</string>
 </resources>

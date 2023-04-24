@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraIndoor
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.LoadingScreen
+import com.leandrolcd.dogedexmvvm.ui.camera.ButtonCamera
 import com.leandrolcd.dogedexmvvm.ui.camera.CameraCompose
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
@@ -46,6 +49,8 @@ fun DogListScreen(
     viewModel: DogListViewModel = hiltViewModel()
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+
+    viewModel.navHostController = navHostController
 
     val uiState by produceState<UiStatus<List<Dog>>>(
         initialValue = UiStatus.Loading(),
@@ -88,25 +93,37 @@ fun DogListContent(navHostController: NavHostController, viewModel: DogListViewM
         mutableStateOf(0)
     }
     Scaffold(topBar = {
-        MyTopBar()
+        MyTopBar { viewModel.logout() }
     },
     bottomBar = {
         MyBottomBar(index){
             index = it
         }
-    }) {
-
-        if(index == 0){
-            DogCollection(dogList, onItemSelected)
-        }else{
-            CameraCompose() {
+    },
+    floatingActionButtonPosition = FabPosition.Center,
+    floatingActionButton = {
+        if(index == 1){
+            val dog = viewModel.dogRecognition.value.first()
+            ButtonCamera(dog.confidence > 69) {
                 navHostController.navigate(Routes.ScreenDogDetail.routeName(
                     true,
-
                     viewModel.dogRecognition.value
                 ))
             }
         }
+
+    },
+    isFloatingActionButtonDocked = true) {
+
+        if(index == 0){
+            Box(Modifier.padding(it)){
+            DogCollection(dogList, onItemSelected)
+            }
+        }else{
+            CameraCompose()
+
+        }
+
 
     }
 }
@@ -192,12 +209,17 @@ fun DogAnimation(){
     )
 }
 @Composable
-fun MyTopBar() {
+fun MyTopBar(onClick: () -> Unit) {
     TopAppBar(
-        title = { Text(text = stringResource(R.string.title_top_bar)) },
-        backgroundColor = primaryColor,
+        title = { Text(text = "Dog Collection") },
+        backgroundColor = backGroudColor,
         contentColor = Color.Black,
-        elevation = 8.dp
+        elevation = 8.dp,
+        actions = {
+            IconButton(onClick = { onClick() }) {
+                Icon(imageVector = Icons.Outlined.Logout, contentDescription ="Logout" )
+            }
+        }
 
     )
 }
@@ -205,6 +227,7 @@ fun MyTopBar() {
 fun MyBottomBar(index:Int, onClickSelect:(Int)->Unit) {
     BottomAppBar(backgroundColor = backGroudColor,
         contentColor = Color.Black,
+        cutoutShape = CircleShape,
         elevation = 8.dp) {
         BottomNavigationItem(selected = index == 0, onClick = { onClickSelect(0) }, icon = {
             Icon(

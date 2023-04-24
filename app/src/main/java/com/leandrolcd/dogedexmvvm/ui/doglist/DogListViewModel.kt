@@ -1,16 +1,20 @@
 package com.leandrolcd.dogedexmvvm.ui.doglist
 
 
+import android.util.Log
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.leandrolcd.dogedexmvvm.data.network.FireStoreService
 import com.leandrolcd.dogedexmvvm.data.repositoty.IClassifierRepository
+import com.leandrolcd.dogedexmvvm.domain.AuthLoginUseCase
 import com.leandrolcd.dogedexmvvm.domain.GetDogListUseCase
 import com.leandrolcd.dogedexmvvm.ui.camera.CameraX
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,13 +27,16 @@ class DogListViewModel @Inject constructor(
     cameraX: CameraX,
     private val classifierRepository: IClassifierRepository,
     private val dataStore: FireStoreService,
-    private val dogUseCase: GetDogListUseCase
+    private val dogUseCase: GetDogListUseCase,
+    private val loginUseCase: AuthLoginUseCase
 ) : ViewModel() {
 
     var cameraX = mutableStateOf(cameraX)
         private set
 
     lateinit var uiStatus: StateFlow<UiStatus<List<Dog>>>
+
+    lateinit var navHostController: NavHostController
 
     val dogRecognition = mutableStateOf(listOf(DogRecognition("",0f)))
 
@@ -71,5 +78,13 @@ fun recognizerImage(imageProxy: ImageProxy) {
         imageProxy.close()
     }
 }
+
+    fun logout() {
+         loginUseCase.logout()
+        val user = loginUseCase.getUser()
+        Log.d("TAG", "logout: $user")
+        navHostController.popBackStack()
+        navHostController.navigate(Routes.ScreenLogin.route)
+    }
 
 }
