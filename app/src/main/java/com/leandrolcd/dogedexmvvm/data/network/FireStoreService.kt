@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.leandrolcd.dogedexmvvm.data.model.DogDTO
+import com.leandrolcd.dogedexmvvm.data.dto.DogDTO
 import com.leandrolcd.dogedexmvvm.ui.model.Dogfb
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

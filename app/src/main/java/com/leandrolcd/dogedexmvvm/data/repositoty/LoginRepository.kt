@@ -2,6 +2,7 @@ package com.leandrolcd.dogedexmvvm.data.repositoty
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
+import com.leandrolcd.dogedexmvvm.data.dto.NetworkCallAnswer
 import com.leandrolcd.dogedexmvvm.data.network.LoginService
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.model.LoginUser
@@ -11,6 +12,23 @@ import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 class LoginRepository @Inject constructor(private val loginService: LoginService) {
+    suspend fun onForgotPassword(email: String): NetworkCallAnswer<Boolean> =
+        suspendCancellableCoroutine { continuation ->
+            loginService.forgotPassword(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        continuation.resume(
+                        NetworkCallAnswer.Success(true), null)
+                    } else {
+                        continuation.resume(
+                            NetworkCallAnswer.Error(
+                                task.exception?.message!!
+                            ), null
+                        )
+                    }
+                }
+
+        }
 
     suspend fun authLogin(user: LoginUser): UiStatus<Any> =
         suspendCancellableCoroutine { continuation ->
@@ -68,14 +86,14 @@ class LoginRepository @Inject constructor(private val loginService: LoginService
                 loginService.createUserWithEmailAndPassword(user.email, user.password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.d("authLogin", "authLogin: El usuario ha iniciado sesión con éxito")
+                            Log.d("authLogin", "authLogin: El usuario se ha registrado con éxito")
                             val userD = task.result?.user
                             continuation.resume(UiStatus.Success(userD!!), null)
                         } else {
-                            Log.d("authLogin", "Error al iniciar sesión")
+                            Log.d("authLogin", "Error al intentar Crear el usuario: $task")
                             continuation.resume(
                                 UiStatus.Error(
-                                    task.exception?.message ?: "Error desconocido"
+                                    task.exception!!.message!!
                                 ), null
                             )
                         }

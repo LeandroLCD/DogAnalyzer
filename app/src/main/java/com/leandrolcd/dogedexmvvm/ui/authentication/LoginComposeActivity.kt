@@ -17,6 +17,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -42,7 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
 class LoginComposeActivity : ComponentActivity() {
-
+    lateinit var navigationController:NavHostController
     private val loginViewModel: LoginComposeViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -68,7 +69,7 @@ class LoginComposeActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     @Composable
     fun OnRegisterRoutes() {
-        val navigationController = rememberNavController()
+        navigationController = rememberNavController()
 
         NavHost(navController = navigationController, startDestination = Routes.ScreenLoading.route) {
             composable(route = Routes.ScreenLoading.route) {
@@ -133,7 +134,7 @@ class LoginComposeActivity : ComponentActivity() {
         try {
 
             val account = task.getResult(ApiException::class.java)!!
-            loginViewModel.onLoginWithGoogle(account.idToken!!)
+            loginViewModel.onLoginWithGoogle(account.idToken!!, navigationController)
         } catch (e: ApiException) {
             Log.w("log", "signInResult:failed code=${e.statusCode} ")
             Toast.makeText(

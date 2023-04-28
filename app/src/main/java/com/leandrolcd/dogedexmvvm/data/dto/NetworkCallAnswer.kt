@@ -1,4 +1,4 @@
-package com.leandrolcd.dogedexmvvm.data.model
+package com.leandrolcd.dogedexmvvm.data.dto
 
 sealed class NetworkCallAnswer<T>(){
 

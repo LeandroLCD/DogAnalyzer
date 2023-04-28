@@ -7,7 +7,7 @@ import android.net.ConnectivityManager
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
-import com.leandrolcd.dogedexmvvm.data.model.DogDTO
+import com.leandrolcd.dogedexmvvm.data.dto.DogDTO
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine

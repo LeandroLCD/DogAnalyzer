@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-suspend fun <T> makeNetworkCall(dispatcher: CoroutineDispatcher = Dispatchers.IO,call: suspend () -> T): UiStatus<T> {
+suspend fun <T> makeNetworkCall(dispatcher: CoroutineDispatcher = Dispatchers.IO, call: suspend () -> T): UiStatus<T> {
     return withContext(dispatcher) {
-        var msjError: String
+        var msjError = ""
         try {
             UiStatus.Success(call())
         } catch (e: Exception){

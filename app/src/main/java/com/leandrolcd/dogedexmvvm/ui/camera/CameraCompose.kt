@@ -4,18 +4,17 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Camera
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -51,24 +50,24 @@ fun CameraCompose(
     LaunchedEffect(key1 = true) {
         launcher.launch(
             arrayOf(
-                android.Manifest.permission.CAMERA
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
     }
     //endregion
 
 
-
     Surface(modifier = Modifier.fillMaxSize()) {
         if (hasCamPermission) {
             Column(Modifier.fillMaxSize()) {
-                AndroidView( modifier = Modifier.fillMaxSize(),
-                factory = {
-                    viewModel.cameraX.value.startCameraPreviewView {
-                    viewModel.recognizerImage(it)
+                AndroidView(modifier = Modifier.fillMaxSize(),
+                    factory = {
+                        viewModel.cameraX.value.startCameraPreviewView {
+                            viewModel.recognizerImage(it)
+                        }
                     }
-                }
-            )
+                )
             }
 
 
@@ -78,26 +77,27 @@ fun CameraCompose(
 }
 
 @Composable
-fun ButtonCamera(enabled:Boolean = true, onCaptureClick: () -> Unit) {
-    FloatingActionButton(onClick = {  }, backgroundColor = Color.Transparent) {
-        if(enabled){
+fun ButtonCamera(enabled: Boolean = true, onCaptureClick: () -> Unit) {
+    FloatingActionButton(onClick = { }, backgroundColor = Color.Transparent) {
+        if (enabled) {
             Icon(imageVector = Icons.Sharp.Camera,
-                contentDescription ="Capture dog",
+                contentDescription = "Capture dog",
                 tint = primaryColor,
                 modifier = Modifier
                     .clickable { onCaptureClick() }
                     .width(60.dp)
                     .height(60.dp))
-        }else{
-            Icon(imageVector = Icons.Sharp.Camera,
-                contentDescription ="Capture dog",
+        } else {
+            Icon(
+                imageVector = Icons.Sharp.Camera,
+                contentDescription = "Capture dog",
                 tint = primaryColor.opacity(0.5f),
                 modifier = Modifier
                     .width(60.dp)
-                    .height(60.dp))
+                    .height(60.dp)
+            )
         }
     }
-
 
 
 }

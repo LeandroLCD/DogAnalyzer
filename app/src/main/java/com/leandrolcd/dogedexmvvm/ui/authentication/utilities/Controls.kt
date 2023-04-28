@@ -1,5 +1,7 @@
 package com.leandrolcd.dogedexmvvm.ui.authentication.utilities
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,15 +18,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.dogedexmvvm.R
-import com.leandrolcd.dogedexmvvm.ui.model.Routes
-import com.leandrolcd.dogedexmvvm.ui.ui.theme.*
+import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeViewModel
+import com.leandrolcd.dogedexmvvm.ui.doglist.DogAnimation
+import com.leandrolcd.dogedexmvvm.ui.ui.theme.backGroupTextField
+import com.leandrolcd.dogedexmvvm.ui.ui.theme.colorGray
+import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
+import com.leandrolcd.dogedexmvvm.ui.ui.theme.textColor
 import kotlinx.coroutines.delay
 import kotlin.math.floor
 
@@ -36,7 +45,7 @@ fun MyButton(label: String, isButtonEnabled: Boolean, onClickSignUp: () -> Unit)
         modifier = Modifier.width(150.dp),
         contentPadding = PaddingValues(4.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = backGroudColor,
+            backgroundColor = primaryColor,
             contentColor = textColor,
             disabledContentColor = backGroupTextField
         ),
@@ -50,9 +59,9 @@ fun MyButton(label: String, isButtonEnabled: Boolean, onClickSignUp: () -> Unit)
         Text(text = label)
     }
 }
+
 @Composable
-fun Huellas()
-{
+fun Huellas() {
     val configuration = LocalConfiguration.current
     Icon(
         painter = painterResource(id = R.drawable.huellas),
@@ -67,21 +76,26 @@ fun Huellas()
 
 @Composable
 fun MyIcon(image: ImageVector) {
-    Icon(imageVector = image, contentDescription = "Icons")
+    Icon(imageVector = image, contentDescription = "Icons", tint = primaryColor)
 }
 
 @Composable
 fun EmailFields(
-    modifier: Modifier = Modifier.fillMaxWidth(),
     label: String,
     text: String,
     onValueChange: (String) -> Unit,
     icons: @Composable () -> Unit,
-    onComplete:()->Unit
+    onComplete: () -> Unit,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     TextField(
         placeholder = { Text(text = label, color = textColor) }, value = text,
-        onValueChange = { onValueChange(it) },
+        onValueChange = {
+            val pattern = "^\\S*$".toRegex()
+            if (pattern.matches(it)) {
+                onValueChange(it)
+            }
+        },
         leadingIcon = icons,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -90,7 +104,7 @@ fun EmailFields(
         ),
         keyboardActions = KeyboardActions(onDone = {
             onComplete()
-             }),
+        }),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = textColor,
             disabledLabelColor = Color.Gray,
@@ -117,14 +131,15 @@ private fun Color.toAlpha(alpha: Float): Color {
 
 @Composable
 fun PasswordFields(
-    modifier: Modifier = Modifier.fillMaxWidth(),
+
     label: String,
     text: String,
     onValueChange: (String) -> Unit,
     icons: @Composable () -> Unit,
-    action:ImeAction = ImeAction.Done,
+    action: ImeAction = ImeAction.Done,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    onComplete:()->Unit
+    onComplete: () -> Unit
 ) {
     var passwordVisibility by remember {
         mutableStateOf(false)
@@ -134,7 +149,13 @@ fun PasswordFields(
     TextField(
         placeholder = { Text(text = label, color = textColor) },
         value = text,
-        onValueChange = { onValueChange(it) },
+        onValueChange = {
+            val pattern = "^\\S*$".toRegex()
+            if (pattern.matches(it)) {
+                onValueChange(it)
+            }
+
+        },
         visualTransformation = if (passwordVisibility) {
             VisualTransformation.None
         } else {
@@ -145,7 +166,7 @@ fun PasswordFields(
             keyboardType = KeyboardType.Password,
             imeAction = action
         ),
-        keyboardActions = KeyboardActions(onDone = {onComplete()}),
+        keyboardActions = KeyboardActions(onDone = { onComplete() }),
         leadingIcon = icons,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = textColor,
@@ -169,16 +190,19 @@ fun PasswordFields(
                 Icons.Outlined.VisibilityOff
             }
             IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                Icon(imageVector = img, contentDescription = "Visibility Password")
+                Icon(
+                    imageVector = img,
+                    contentDescription = stringResource(R.string.password_visibility)
+                )
             }
         },
 
 
-    )
+        )
 }
 
 @Composable
-fun LogoAnimationView(isPlaying:Boolean, onComplete: () -> Unit) {
+fun LogoAnimationView(isPlaying: Boolean, onComplete: () -> Unit) {
 
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.dalmata))
     val progress by animateLottieCompositionAsState(
@@ -193,40 +217,105 @@ fun LogoAnimationView(isPlaying:Boolean, onComplete: () -> Unit) {
         progress = progress,
         modifier = Modifier.fillMaxSize()
     )
-     LaunchedEffect(isPlaying){
-         delay(1500)
-         onComplete()
-     }
+    LaunchedEffect(isPlaying) {
+        delay(1500)
+        onComplete()
+    }
 
 }
+
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier){
+fun LoadingScreen(modifier: Modifier = Modifier) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.huella))
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = LottieConstants.IterateForever,
     )
-    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         LottieAnimation(
             composition,
             progress,
             modifier = Modifier
                 .width(200.dp)
-                .height(200.dp))
+                .height(200.dp)
+        )
     }
 
 
 }
+
 @Composable
-fun StartScreen(navController: NavHostController) {
-    LaunchedEffect(true){
+fun StartScreen(
+    navController: NavHostController,
+    viewModel: LoginComposeViewModel = hiltViewModel()
+) {
+    LaunchedEffect(true) {
+
+        viewModel.onCheckedUserCurrent(navController)
         delay(2000)
-        navController.popBackStack()
-        navController.navigate(Routes.ScreenLogin.route)
 
     }
 
     LoadingScreen()
 
+}
+
+
+@Composable
+fun ScreenError(error: String) {
+    ConstraintLayout(
+        Modifier
+            .fillMaxSize()
+            .background(colorGray)
+    ) {
+        val (header, body, button) = createRefs()
+        val topGuide = createGuidelineFromTop(0.35f)
+
+
+        Box(modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth()
+            .fillMaxHeight(0.70f)
+            .constrainAs(body) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(36.dp, 36.dp, 0.dp, 0.dp),
+                color = Color.White,
+                elevation = 8.dp,
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                    Text(text = error, Modifier.padding(top = 46.dp))
+                }
+
+            }
+        }
+        Box(
+            modifier = Modifier
+                .size(220.dp)
+                .constrainAs(header) {
+                    end.linkTo(parent.end)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(topGuide)
+                }, contentAlignment = Alignment.BottomCenter
+        ) {
+            DogAnimation()
+        }
+        Button(
+            onClick = { },
+            modifier = Modifier.constrainAs(button) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            colors = ButtonDefaults.buttonColors(primaryColor)
+        ) {
+            Text(text = stringResource(R.string.ok))
+        }
+
+    }
 }

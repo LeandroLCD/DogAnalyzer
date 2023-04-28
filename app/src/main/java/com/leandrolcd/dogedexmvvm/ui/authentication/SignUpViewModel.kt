@@ -18,7 +18,7 @@ class SignUpViewModel @Inject constructor(
 
 
     //region Properties
-    var email = mutableStateOf<String>("")
+    var email = mutableStateOf("")
         private set
 
     var password = mutableStateOf("")
@@ -43,7 +43,14 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun enabledButton(email: String, password: String, passwordConfirmation: String) =
-        Patterns.EMAIL_ADDRESS.matcher(email).matches() && password == passwordConfirmation
+        Patterns.EMAIL_ADDRESS.matcher(email).matches() && onValuePassword(password, passwordConfirmation)
+    private fun onValuePassword(password: String, passwordConfirmation: String): Boolean {
+        val pattern = buildString {
+        append("^[a-zA-Z0-9]{6,}$")
+    }.toRegex()
+        val isEqual = passwordConfirmation == password
+        return pattern.matches(passwordConfirmation) && pattern.matches(password) && isEqual
+    }
 
     fun onTryAgain() {
         uiStatus.value = UiStatus.Loaded()
@@ -53,12 +60,9 @@ class SignUpViewModel @Inject constructor(
         uiStatus.value = UiStatus.Loading()
         viewModelScope.launch {
 
-            uiStatus.value = signUpUseCase.invoke(LoginUser(email.value,password.value))
+            uiStatus.value = signUpUseCase(LoginUser(email.value,password.value))
 
         }
-    }
-    fun TryAgain(){
-        uiStatus.value = UiStatus.Loaded()
     }
 
 }

@@ -2,7 +2,7 @@ package com.leandrolcd.dogedexmvvm.data.repositoty
 
 import android.content.Context
 import com.leandrolcd.dogedexmvvm.core.makeNetworkCall
-import com.leandrolcd.dogedexmvvm.data.model.DogDTO
+import com.leandrolcd.dogedexmvvm.data.dto.DogDTO
 import com.leandrolcd.dogedexmvvm.data.network.FireStoreService
 import com.leandrolcd.dogedexmvvm.isNetworkConnected
 import com.leandrolcd.dogedexmvvm.toDog
@@ -20,6 +20,7 @@ interface IFireStoreRepository{
     suspend fun addDogToUser(dogId: String): UiStatus<Boolean>
     suspend fun getDogCollection(): List<Dog>
     suspend fun getDogById(id:String):UiStatus<Dog>
+    fun clearCache()
     suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>>
 }
 
@@ -51,17 +52,18 @@ class FireStoreRepository @Inject constructor(
 
         return withContext(dispatcher) {
 
-            if (dogListApp.isEmpty()){
+            dogCollection = if(dogListApp.isEmpty()){
                 val dogUserDeferred = async { fireStore.getDogListUser() }
                 val allDogDeferred = async { fireStore.getDogListApp() }
-
+                dogListApp.clear()
+                dogIdUser.clear()
                 val dogUser = dogUserDeferred.await()
                 val dogApp = allDogDeferred.await()
                 dogListApp.addAll(dogApp)
                 dogIdUser.addAll(dogUser)
-                dogCollection = getCollectionList(dogApp, dogUser)
+                getCollectionList(dogApp, dogUser)
             }else{
-                dogCollection = getCollectionList(dogListApp, dogIdUser)
+                getCollectionList(dogListApp, dogIdUser)
             }
 
             dogCollection
@@ -75,6 +77,12 @@ class FireStoreRepository @Inject constructor(
             fireStore.getDogById(id).toDog()
         }
     }
+
+    override fun clearCache() {
+        dogIdUser.clear()
+        dogListApp.clear()
+    }
+
     override suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>> {
         return makeNetworkCall(dispatcher) {
             if (!isNetworkConnected(context)) {

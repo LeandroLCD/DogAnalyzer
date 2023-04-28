@@ -1,7 +1,6 @@
 package com.leandrolcd.dogedexmvvm.ui.authentication.utilities
 
 import android.app.Activity
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,9 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Key
-import androidx.compose.material.icons.outlined.SyncProblem
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,22 +22,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
-import kotlinx.coroutines.delay
 import kotlin.math.floor
 
 
@@ -53,58 +46,27 @@ fun LoginScreen(
     onLoginWithGoogleClicked: () -> Unit
 ) {
 
-    when(val status =viewModel.uiStatus.value){
+    when (val status = viewModel.uiStatus.value) {
         is UiStatus.Error -> {
-            ErrorLoginScreen(status.message){viewModel.onTryAgain()}
+            ErrorLoginScreen(status.message) { viewModel.onTryAgain() }
+            Log.d("LoginScreen", "Status: Error")
         }
         is UiStatus.Loaded -> {
             LoginContent(viewModel, navigationController, onLoginWithGoogleClicked)
+            Log.d("LoginScreen", "Status: Loaded")
         }
         is UiStatus.Loading -> {
+            Log.d("LoginScreen", "Status: Loading")
             LoadingScreen()
         }
         is UiStatus.Success -> {
-            LaunchedEffect(true) {
-                navigationController.popBackStack()
-                navigationController.navigate(Routes.ScreenDogList.route)
-                viewModel.onTryAgain()
-            }
+            Log.d("LoginScreen", "Status: Success")
         }
     }
 
 
 }
 
-
-@Composable
-fun GifScreen(drawable: Int) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        Log.d("LoadingScreen", "LoadingScreen: $SDK_INT")
-        val imageLoader = ImageLoader.Builder(LocalContext.current)
-            .components {
-                if (SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
-            }
-            .build()
-        Column(horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-            Image(
-                painter = rememberAsyncImagePainter(drawable, imageLoader),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                )
-            LinearProgressIndicator()
-            if(SDK_INT<28){
-                LinearProgressIndicator()
-            }
-        }
-
-    }
-}
 
 @Composable
 fun LoginContent(
@@ -133,6 +95,8 @@ fun MyCardLogin(
     var isPlaying by remember {
         mutableStateOf(true)
     }
+    val context = LocalContext.current
+    val email = viewModel.email.value
     Card(
         shape = RoundedCornerShape(topEnd = 30.dp, bottomEnd = 30.dp),
 
@@ -147,21 +111,34 @@ fun MyCardLogin(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            HeaderLogin(Modifier.weight(1f), isPlaying){
+            HeaderLogin(Modifier.weight(1f), isPlaying) {
                 isPlaying = false
             }
-            BodyLogin(Modifier.weight(1f), viewModel){
-                Log.d("TAG", "isPlaying: true")
+            BodyLogin(Modifier.weight(1f), viewModel, onVisibleForgot = {
+                viewModel.onDismissDialog(true)
+            }) {
                 isPlaying = true
             }
-            FooterLogin(Modifier.weight(1f), viewModel, navigationController, onLoginWithGoogleClicked)
+            FooterLogin(
+                Modifier.weight(1f),
+                viewModel,
+                navigationController,
+                onLoginWithGoogleClicked
+            )
+            ForgotPasswordDialog(email = email,
+                isVisible = viewModel.isDialogForgot.value,
+                onDismissRequest = { viewModel.onDismissDialog() }, onChangedText = {
+                    viewModel.onLoginChange(it, "")
+                }) {
+                viewModel.onForgotPassword(email, context)
+            }
         }
 
     }
 }
 
 @Composable
-fun HeaderLogin(modifier: Modifier, isPlaying: Boolean,stopPlaying:()->Unit) {
+fun HeaderLogin(modifier: Modifier, isPlaying: Boolean, stopPlaying: () -> Unit) {
     val activity = LocalContext.current as Activity
     Box(
         modifier = modifier
@@ -175,7 +152,8 @@ fun HeaderLogin(modifier: Modifier, isPlaying: Boolean,stopPlaying:()->Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Close,
-                    contentDescription = "Exits App"
+                    contentDescription = stringResource(R.string.exit_app),
+                    tint = primaryColor
                 )
             }
 
@@ -183,15 +161,13 @@ fun HeaderLogin(modifier: Modifier, isPlaying: Boolean,stopPlaying:()->Unit) {
         }
 
 
-        LogoAnimationView(isPlaying){
+        LogoAnimationView(isPlaying) {
             stopPlaying()
         }
 
 
-
     }
 }
-
 
 
 @Composable
@@ -207,8 +183,8 @@ fun FooterLogin(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            MyButton(label = "Sign In", viewModel.isButtonEnabled.value) {
-                viewModel.onLoginClicked()
+            MyButton(label = stringResource(R.string.sain_in), viewModel.isButtonEnabled.value) {
+                viewModel.onLoginClicked(navigationController)
             }
             LoginWithGoogle(Modifier) {
                 onLoginWithGoogleClicked()
@@ -222,7 +198,12 @@ fun FooterLogin(
 }
 
 @Composable
-fun BodyLogin(modifier: Modifier = Modifier, viewModel: LoginComposeViewModel,onComplete:()->Unit) {
+fun BodyLogin(
+    modifier: Modifier = Modifier,
+    viewModel: LoginComposeViewModel,
+    onVisibleForgot: () -> Unit,
+    onComplete: () -> Unit
+) {
     val email = viewModel.email.value
     val password = viewModel.password.value
 
@@ -232,47 +213,113 @@ fun BodyLogin(modifier: Modifier = Modifier, viewModel: LoginComposeViewModel,on
     ) {
 
         EmailFields(
-            Modifier.fillMaxWidth(),
-            label = "Email",
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(R.string.email),
             text = email,
             icons = { MyIcon(Icons.Default.Email) },
             onValueChange = {
                 viewModel.onLoginChange(it, password)
             },
-            onComplete = {onComplete()}
+            onComplete = { onComplete() }
         )
         PasswordFields(
-            label = "Password",
+            label = stringResource(R.string.password),
             text = password,
             icons = { MyIcon(Icons.Outlined.Key) },
             onValueChange = {
                 viewModel.onLoginChange(email, it)
             },
             visualTransformation = PasswordVisualTransformation('*'),
-            onComplete = {onComplete()}
+            onComplete = { onComplete() }
 
         )
-        ForgotPassword(modifier = Modifier.align(Alignment.End))
+        ForgotPassword(modifier = Modifier
+            .align(Alignment.End)
+            .clickable {
+                onVisibleForgot()
+            })
     }
 }
 
 @Composable
 fun ErrorLoginScreen(message: String, onTryAgain: () -> Unit) {
-    Column(Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_dog),
-            contentDescription = "",
-            modifier = Modifier
+
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = { onTryAgain() }, backgroundColor = primaryColor) {
+            Icon(
+                imageVector = Icons.Outlined.SyncProblem,
+                contentDescription = stringResource(R.string.try_again),
+                tint = Color.White
+            )
+        }
+    }, floatingActionButtonPosition = FabPosition.Center) {
+        Column(
+            Modifier
                 .fillMaxSize()
-                .weight(1f)
-        )
-        Text(text = message, softWrap = true)
-        FloatingActionButton(onClick = { onTryAgain() }) {
-            Icon(imageVector = Icons.Outlined.SyncProblem, contentDescription = "Try Again")
+                .padding(it)
+                .padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.dalmata))
+            val progress by animateLottieCompositionAsState(
+                composition,
+                iterations = LottieConstants.IterateForever,
+                isPlaying = true,
+                restartOnPlay = true
+            )
+
+            LottieAnimation(
+                composition = composition,
+                progress = progress,
+                modifier = Modifier.size(200.dp)
+            )
+            Text(text = message, softWrap = true)
+
         }
     }
+
 }
 
+@Composable
+fun ForgotPasswordDialog(
+    isVisible: Boolean = false,
+    email: String,
+    onDismissRequest: () -> Unit,
+    onChangedText: (String) -> Unit, sendClicked: () -> Unit
+) {
+    if (isVisible) {
+        AlertDialog(onDismissRequest = { onDismissRequest() },
+            title = {
+                Row {
+                    Icon(
+                        imageVector = Icons.Outlined.Pets,
+                        contentDescription = stringResource(id = R.string.dog_image)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.forogot_password_title),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            text = {
+                EmailFields(label = stringResource(id = R.string.email),
+                    text = email,
+                    onValueChange = {
+                        onChangedText(it)
+                    },
+                    icons = { Icon(imageVector = Icons.Outlined.Email, contentDescription = null) },
+                    onComplete = {})
+            },
+            confirmButton = {
+                TextButton(onClick = { sendClicked() }) {
+                    Text(text = stringResource(R.string.send))
+                }
+            }
+        )
+    }
+
+}
 
 //region Body
 
@@ -283,14 +330,13 @@ fun ErrorLoginScreen(message: String, onTryAgain: () -> Unit) {
 @Composable
 fun ForgotPassword(modifier: Modifier) {
     Text(
-        text = "Forgot Password?",
+        text = stringResource(R.string.forogot),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF4Ea8E9),
+        color = primaryColor,
         modifier = modifier
     )
 }
-
 
 @Composable
 fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
@@ -306,25 +352,29 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
                 Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
-                    .align(CenterVertically))
-            Text("Continuar con")
+                    .align(CenterVertically)
+            )
+            Text(stringResource(R.string.continue_with_login))
             MyDivider(
                 Modifier
                     .weight(1f)
                     .padding(start = 8.dp)
-                    .align(CenterVertically))
+                    .align(CenterVertically)
+            )
 
         }
-        Image(painter = painterResource(id = R.drawable.ic_google),
-            contentDescription = "LoginWithGoogle",
+        IconButton(
+            onClickAction,
             modifier = modifier
-                .width(40.dp)
-                .height(40.dp)
+                .width(60.dp)
+                .height(60.dp)
                 .padding(bottom = 16.dp)
-                .clickable {
-                    onClickAction()
-                }
-        )
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = "LoginWithGoogle"
+            )
+        }
     }
 
 
@@ -339,7 +389,6 @@ fun MyDivider(modifier: Modifier = Modifier) {
             .padding(vertical = 4.dp)
     )
 }
-
 
 
 //endregion
@@ -360,9 +409,9 @@ fun SignUp(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Bottom
     ) {
-        Text("Don't have an account?", fontSize = 12.sp, color = Color.Black)
+        Text(stringResource(R.string.dont_have_an_account), fontSize = 12.sp, color = Color.Black)
         Text(
-            "Sign Up",
+            stringResource(R.string.sign_up),
             Modifier
                 .padding(start = 8.dp)
                 .clickable { onSignUpClicked() },

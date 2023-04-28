@@ -25,6 +25,9 @@ class LoginService @Inject constructor( private val firebaseAuth: FirebaseAuth
         return firebaseAuth.createUserWithEmailAndPassword(email, password)
     }
 
+    fun forgotPassword(email: String): Task<Void> {
+        return firebaseAuth.sendPasswordResetEmail(email)
+    }
 
     fun signOut() {
        firebaseAuth.signOut()
