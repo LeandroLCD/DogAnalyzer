@@ -1,6 +1,5 @@
 package com.leandrolcd.dogedexmvvm.ui.doglist
 
-
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -21,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DogListViewModel @Inject constructor(
+class DogListViewModel@Inject constructor(
     cameraX: CameraX,
     private val classifierRepository: IClassifierRepository,
     private val dogUseCase: GetDogListUseCase,

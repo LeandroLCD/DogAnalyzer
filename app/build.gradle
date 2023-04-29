@@ -40,9 +40,9 @@ android {
             keyPassword '26829625-5'
         }
         release {
-            storeFile file('D:/leandrocolmenarez.jks')
+            storeFile file('D:/KeyCertificates/key_dogAnalyzer.jks')
             storePassword '26829625-5'
-            keyAlias 'keyLcd'
+            keyAlias 'keydog'
             keyPassword '26829625-5'
         }
     }

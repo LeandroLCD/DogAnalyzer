@@ -94,11 +94,11 @@ fun CardSignUp(viewModel: SignUpViewModel, navigationController: NavHostControll
                     .fillMaxWidth()
             ) {
 
-                MyHeader(Modifier.weight(1f), navigationController, isPlaying) {
+                MyHeader(Modifier, navigationController, isPlaying) {
                     isPlaying = false
                 }
                 MyBody(viewModel, Modifier.weight(1f))
-                MyFooter(viewModel, Modifier.weight(0.5f))
+                MyFooter(viewModel, Modifier)
             }
 
         }

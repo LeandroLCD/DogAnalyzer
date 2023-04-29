@@ -23,7 +23,7 @@ class DogDetailViewModel @Inject constructor(
 
     //region Fields
     var uiStatus = mutableStateOf<UiStatus<List<Dog>>>(UiStatus.Loaded())
-    private set
+        private set
 
     var dogStatus = mutableStateOf<List<Dog>?>(null)
         private set
@@ -37,15 +37,15 @@ class DogDetailViewModel @Inject constructor(
         viewModelScope.launch {
             uiStatus.value = repository.getDogsByIds(dogs)
 
-              if (uiStatus.value is Success){
-                  dogStatus.value = (uiStatus.value as Success<List<Dog>>).data.sortedByDescending {
-                      it.confidence
-                  }
+            if (uiStatus.value is Success){
+                dogStatus.value = (uiStatus.value as Success<List<Dog>>).data.sortedByDescending {
+                    it.confidence
+                }
 
-                 }
+            }
         }
-}
-fun addDogToUser(dogId: String){
+    }
+    fun addDogToUser(dogId: String){
         uiStatus.value = UiStatus.Loading()
         viewModelScope.launch {
             val resp = repository.addDogToUser(dogId)
@@ -60,8 +60,8 @@ fun addDogToUser(dogId: String){
             }
         }
     }
-fun setNavHostController(navController: NavHostController){
-    navHostController = navController
+    fun setNavHostController(navController: NavHostController){
+        navHostController = navController
 
     }
 
