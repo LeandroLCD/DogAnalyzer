@@ -16,11 +16,11 @@ plugins {
 }
 
 android {
-    namespace 'com.leandrolcd.dogedexmvvm'
+    namespace 'com.leandrolcd.doganalyzer'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.leandrolcd.dogedexmvvm"
+        applicationId "com.leandrolcd.doganalyzer"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -89,7 +89,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
 
-
+    //region Google Ads
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
+    //endregion
 
     // dowload image
     implementation "io.coil-kt:coil:2.3.0"
@@ -102,14 +104,10 @@ dependencies {
     //async and viewModel
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
     implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
 
     //region Animation
     implementation "com.airbnb.android:lottie-compose:4.0.0"
-    //endregion
-
-    //region retrofit
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     //endregion
 
     //region CameraX

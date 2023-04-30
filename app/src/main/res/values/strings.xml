@@ -3,13 +3,13 @@
     <string name="server_client_id">920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com</string>
     <string name="Title">Dog Analyzer</string>
     <string name="continue_with_login">Continue With</string>
-    <string name="forogot">Forgot Password?</string>
+    <string name="forgot">Forgot Password?</string>
     <string name="dont_have_an_account">Don\'t have an account?</string>
     <string name="sign_up">Sign Up</string>
     <string name="try_again">Try Again</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
-    <string name="sain_in">Sign In</string>
+    <string name="sign_in">Sign In</string>
     <string name="exit_app">Exits App</string>
     <string name="ok">OK</string>
     <string name="password_visibility">Visibility Password</string>
@@ -25,6 +25,12 @@
     <string name="cancel">Cancel</string>
     <string name="valid">The valid password</string>
     <string name="password_requirements">* The password requires 6 alphanumeric characters</string>
-    <string name="forogot_password_title">Forgot Password</string>
+    <string name="forgot_password_title">Forgot Password</string>
     <string name="send">Send</string>
+    <string name="show_top_score">Top Score Show</string>
+    <string name="banner_id_release">ca-app-pub-2089536578261112/6373721447</string>
+    <string name="banner_id_debug">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="interstitial_release">ca-app-pub-2089536578261112/3034114376</string>
+
 </resources>

@@ -18,6 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DogedexMVVM"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2089536578261112~7575122479"/>
+
         <activity
             android:name=".ui.authentication.LoginComposeActivity"
             android:screenOrientation="portrait"
