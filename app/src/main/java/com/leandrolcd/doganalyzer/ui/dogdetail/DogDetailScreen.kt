@@ -157,12 +157,18 @@ fun DogScaffold(
     viewModel.dogStatus.value?.let { dogs ->
         DogDialog(isVisible = isVisible, dogList = dogs,
             onDismissRequest = {
-
-                viewModel.interstitialShow(activity)
+                val click = activity.setDetailClick()
+                if (click % 5 == 0 ) {
+                    viewModel.interstitialShow(activity)
+                }
                 isVisible = false
             }, onSelectItems = {
                 dog = it
-                viewModel.interstitialShow(activity)
+                val click = activity.setDetailClick()
+                if (click % 5 == 0 ) {
+                    viewModel.interstitialShow(activity)
+                }
+
                 isVisible = false
             })
     }
@@ -176,13 +182,11 @@ fun interstitialShow(
 
     if(isRecognition){
         val click = context.setRecognitionClick()
-        Log.d("TAG", "interstitialShow $isRecognition: $click")
             if (click % 2 == 0 ) {
                 Show()
             }
     }else{
         val click = context.setDetailClick()
-        Log.d("TAG", "interstitialShow $isRecognition: $click")
         if (click % 5 == 0 ) {
             Show()
         }
@@ -400,7 +404,7 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
                     .fillMaxWidth()
                     .padding(top = 24.dp),
                 text = dog.name,
-                fontSize = 32.sp,
+                fontSize = if(dog.name.length < 16) 32.sp else 22.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black,
                 textAlign = TextAlign.Center
@@ -509,6 +513,7 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -530,7 +535,6 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
                 Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    .verticalScroll(rememberScrollState())
             )
 
             Spacer(modifier = modifier.fillMaxHeight(1f))

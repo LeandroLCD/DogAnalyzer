@@ -28,6 +28,11 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.leandrolcd.doganalyzer.BuildConfig
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
 import com.leandrolcd.doganalyzer.ui.admob.removeInterstitial
@@ -53,12 +58,19 @@ class LoginComposeActivity : ComponentActivity() {
     private val loginViewModel: LoginComposeViewModel by viewModels()
     @Inject
     lateinit var interstitialAdMod: InterstitialAdMod
+    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    val configSettings = remoteConfigSettings {
+        minimumFetchIntervalInSeconds = 30
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val versionName = BuildConfig.VERSION_NAME
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {}
         interstitialAdMod.load(this)
+        remoteConfig.setConfigSettingsAsync(configSettings)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 
         setContent {
             DogedexMVVMTheme {
@@ -86,7 +98,7 @@ class LoginComposeActivity : ComponentActivity() {
 
         NavHost(navController = navigationController, startDestination = Routes.ScreenLoading.route) {
             composable(route = Routes.ScreenLoading.route) {
-                StartScreen(navigationController)
+                StartScreen(navigationController, remoteConfig = remoteConfig)
             }
 
             composable(route = Routes.ScreenLogin.route) {

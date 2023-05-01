@@ -115,7 +115,7 @@ fun MyCardLogin(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            HeaderLogin(Modifier.weight(1f), isPlaying) {
+            HeaderLogin(Modifier, isPlaying) {
                 isPlaying = false
             }
             BodyLogin(Modifier.weight(1f), viewModel, onVisibleForgot = {
@@ -144,10 +144,11 @@ fun MyCardLogin(
 @Composable
 fun HeaderLogin(modifier: Modifier, isPlaying: Boolean, stopPlaying: () -> Unit) {
     val activity = LocalContext.current as Activity
+    val configuration = LocalConfiguration.current
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(floor(configuration.screenHeightDp * 0.3).toInt().dp)
     ) {
         Row(modifier, horizontalArrangement = Arrangement.SpaceBetween) {
             Spacer(modifier = Modifier.weight(1f))
@@ -227,6 +228,7 @@ fun BodyLogin(
             onComplete = { onComplete() }
         )
         PasswordFields(
+            modifier = Modifier.fillMaxWidth(),
             label = stringResource(R.string.password),
             text = password,
             icons = { MyIcon(Icons.Outlined.Key) },

@@ -32,7 +32,7 @@ fun DogDTO.toDog(): Dog {
             heightFemale = this.heightFemale,
             curiosities = this.curiosities,
             weightMaleEs = this.weightMaleEs,
-            weightFemaleEs = this.weightFemale,
+            weightFemaleEs = this.weightFemaleEs,
             heightMaleEs = this.heightMaleEs,
             heightFemaleEs = this.heightFemaleEs,
             curiositiesEs = this.curiositiesEs,

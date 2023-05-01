@@ -143,6 +143,7 @@ fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
             onValueChange = { viewModel.onSignUpChanged(it, password, passwordConfirmation) },
             onComplete = { isPlaying = false })
         PasswordFields(
+            modifier = Modifier.fillMaxWidth(),
             label = stringResource(R.string.password),
             text = password,
             icons = { MyIcon(Icons.Outlined.Key) },
@@ -152,6 +153,7 @@ fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
             onComplete = { isPlaying = false }
         )
         PasswordFields(
+            modifier = Modifier.fillMaxWidth(),
             label = stringResource(R.string.confirm_password),
             text = passwordConfirmation,
             icons = { MyIcon(Icons.Outlined.Key) },
@@ -196,10 +198,11 @@ fun MyHeader(
     stopPlaying: () -> Unit
 ) {
     val activity = LocalContext.current as Activity
+    val configuration = LocalConfiguration.current
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(floor(configuration.screenHeightDp * 0.3).toInt().dp)
     ) {
         Row(modifier) {
             IconButton(

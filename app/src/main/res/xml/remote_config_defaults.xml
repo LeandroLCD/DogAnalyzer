@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>version_minima</key>
+        <value>1.0.0.0</value>
+    </entry>
+    <entry>
+        <key>url_play_store</key>
+        <value></value>
+    </entry>
+</defaultsMap>

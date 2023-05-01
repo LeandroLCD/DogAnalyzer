@@ -32,5 +32,8 @@
     <string name="banner_id_debug">ca-app-pub-3940256099942544/6300978111</string>
     <string name="interstitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
     <string name="interstitial_release">ca-app-pub-2089536578261112/3034114376</string>
+    <string name="update_require_es">Para continuar es necesario instalar la última actualización</string>
+    <string name="update_require_en">To continue it is required to install the latest update</string>
+    <string name="update">Update</string>
 
 </resources>

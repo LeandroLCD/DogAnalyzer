@@ -1,13 +1,19 @@
 package com.leandrolcd.doganalyzer.ui.authentication.utilities
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.*
@@ -17,23 +23,30 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.leandrolcd.doganalyzer.BuildConfig
+import com.leandrolcd.doganalyzer.LANGUAGE
 import com.leandrolcd.doganalyzer.R
+import com.leandrolcd.doganalyzer.isSpanish
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
+import com.leandrolcd.doganalyzer.ui.dogdetail.ItemDogR
 import com.leandrolcd.doganalyzer.ui.doglist.DogAnimation
-import com.leandrolcd.doganalyzer.ui.ui.theme.backGroupTextField
-import com.leandrolcd.doganalyzer.ui.ui.theme.colorGray
-import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
-import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
+import com.leandrolcd.doganalyzer.ui.ui.theme.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlin.math.floor
@@ -250,16 +263,94 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun StartScreen(
     navController: NavHostController,
+    remoteConfig: FirebaseRemoteConfig,
     viewModel: LoginComposeViewModel = hiltViewModel()
 ) {
+    var urlPlayStore by remember {
+        mutableStateOf("")
+    }
+    var isRequireUpdate by remember {
+        mutableStateOf(false)
+    }
+    val context = LocalContext.current
     LaunchedEffect(true) {
+        remoteConfig.fetchAndActivate().addOnCompleteListener { task->
+            if (task.isSuccessful) {
+                val versionMinima = remoteConfig.getString("version_minima")
+                urlPlayStore = remoteConfig.getString("url_play_store")
+                val compare= versionMinima.compareTo(BuildConfig.VERSION_NAME)
+                if (compare > 0) {
+                    isRequireUpdate = true
+                }
+                else
+                {
+                    viewModel.onCheckedUserCurrent(navController)
+                }
+            }else{
+                viewModel.onCheckedUserCurrent(navController)
+            }
 
-        viewModel.onCheckedUserCurrent(navController)
+        }
         delay(2000)
 
     }
+    Box(Modifier.fillMaxSize()){
+        LoadingScreen()
+        UpdateDialog(isVisible = isRequireUpdate, onUpdateClicked={
 
-    LoadingScreen()
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlPlayStore))
+            startActivity(context,intent, null)
+
+        })
+    }
+
+
+}
+
+@Composable
+fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
+    if (isVisible) {
+        AlertDialog(onDismissRequest = {},
+            title = {
+                Row(
+                    modifier = Modifier.padding(bottom = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Pets,
+                        contentDescription = stringResource(id = R.string.dog_image),
+                        tint = Purple200,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Purple200
+                    )
+                }
+            },
+            text = {
+                Text(
+                    text = if (LANGUAGE.isSpanish()) {
+                        stringResource(R.string.update_require_es)
+                    } else {
+                        stringResource(R.string.update_require_en)
+                    },
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onUpdateClicked() }) {
+                    Text(text = stringResource(R.string.update))
+                }
+            }
+        )
+    }
 
 }
 

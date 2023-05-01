@@ -24,7 +24,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -164,6 +164,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.firebase:firebase-config-ktx'
     //endregion
 
     //region Dependency Injection 'dagger hilt' Implementations
