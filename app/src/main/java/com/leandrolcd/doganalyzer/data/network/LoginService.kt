@@ -25,6 +25,10 @@ class LoginService @Inject constructor( private val firebaseAuth: FirebaseAuth
         return firebaseAuth.createUserWithEmailAndPassword(email, password)
     }
 
+    fun onSignInAnonymously(): Task<AuthResult> {
+        return firebaseAuth.signInAnonymously()
+    }
+
     fun forgotPassword(email: String): Task<Void> {
         return firebaseAuth.sendPasswordResetEmail(email)
     }

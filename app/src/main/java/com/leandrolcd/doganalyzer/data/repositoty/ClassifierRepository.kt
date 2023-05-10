@@ -14,8 +14,7 @@ class ClassifierRepository @Inject constructor (private val classifier: Classifi
 
     override suspend fun recognizeImage(imageProxy: ImageProxy): List<DogRecognition> {
         return withContext(Dispatchers.IO){
-            imageProxy.imageInfo.rotationDegrees
-            val bitmap = imageProxy.toBitmap()
+           val bitmap = imageProxy.toBitmap()
             classifier.recognizeImage(bitmap.rotate()).take(5)
         }
 

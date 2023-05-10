@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ClassifierModule {
+abstract class ClassifierBinds {
     @Binds
     abstract fun bindsClassifier(classifierRepository: ClassifierRepository): IClassifierRepository
 

@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.leandrolcd.doganalyzer.data.dto.NetworkCallAnswer
-import com.leandrolcd.doganalyzer.domain.AuthLoginUseCase
-import com.leandrolcd.doganalyzer.domain.AuthLoginWithGoogleUseCase
-import com.leandrolcd.doganalyzer.domain.ForgotPasswordUseCase
+import com.leandrolcd.doganalyzer.data.repositoty.IFireStoreRepository
+import com.leandrolcd.doganalyzer.data.repositoty.LoginRepository
 import com.leandrolcd.doganalyzer.ui.model.LoginUser
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
@@ -25,9 +25,8 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class LoginComposeViewModel @Inject constructor(
-    private val authLoginWithGoogleUseCase: AuthLoginWithGoogleUseCase,
-    private val authLoginUseCase: AuthLoginUseCase,
-    private val forgotUseCase: ForgotPasswordUseCase
+    private val repository: LoginRepository,
+    private val fireStore: IFireStoreRepository
 ): ViewModel() {
 
     //region Properties
@@ -60,18 +59,50 @@ class LoginComposeViewModel @Inject constructor(
         uiStatus.value = UiStatus.Loading()
         viewModelScope.launch {
 
-            uiStatus.value = authLoginUseCase.invoke(LoginUser(email.value,password.value))
+            uiStatus.value = repository.authLogin(LoginUser(email.value,password.value))
             onNavigate(navHostController)
         }
     }
     fun onLoginWithGoogle(idToken: String, navHostController: NavHostController) {
         uiStatus.value = UiStatus.Loading()
-        viewModelScope.launch {
-            uiStatus.value = authLoginWithGoogleUseCase.invoke(idToken)
-            onNavigate(navHostController)
 
-        }
+            val currentUser = repository.getUser()
+            if (currentUser != null && currentUser.isAnonymous) {
+                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                currentUser.linkWithCredential(credential).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        uiStatus.value = UiStatus.Success(Unit)
+                        onNavigate(navHostController)
+
+                    } else {
+                            val error = task.exception?.message
+                            if (error != null && error.contains("credential is already")) {
+                                currentUser.delete().addOnSuccessListener {
+                                    viewModelScope.launch {
+                                        uiStatus.value =  repository.authLoginWithGoogle(idToken)
+                                        fireStore.synchronizeNow()
+                                        onNavigate(navHostController)
+                                    }
+                                }
+
+                            }else{
+                                uiStatus.value =
+                                    UiStatus.Error(task.exception?.message ?: "Unknown error")
+
+                            }
+
+
+                        }
+
+                }
+            }else{
+                uiStatus.value = UiStatus.Error("User is not anonymous or user is null")
+            }
+
+
     }
+
+
     private fun onNavigate(navHostController: NavHostController){
     if(uiStatus.value is UiStatus.Success){
         navHostController.popBackStack()
@@ -89,22 +120,24 @@ class LoginComposeViewModel @Inject constructor(
         uiStatus.value = UiStatus.Loaded()
     }
     fun onCheckedUserCurrent(navHostController: NavHostController) {
-        authLoginUseCase.getUser()?.let { user ->
+        repository.getUser()?.let { user ->
             userCurrent.value = user
         }
         if(userCurrent.value == null){
-            navHostController.popBackStack()
-            navHostController.navigate(Routes.ScreenLogin.route)
-        }else{
+            viewModelScope.launch {
+                userCurrent.value = repository.onSignInAnonymously()
+            }
+
+        }
 
             navHostController.popBackStack()
             navHostController.navigate(Routes.ScreenDogList.route)
-        }
+
     }
     fun onForgotPassword(email: String, context: Context){
         if(Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             viewModelScope.launch {
-                val resp = forgotUseCase(email)
+                val resp = repository.onForgotPassword(email)
                 Log.d("TAG", "onForgotPassword: $resp")
                 when(resp){
                     is NetworkCallAnswer.Error -> {

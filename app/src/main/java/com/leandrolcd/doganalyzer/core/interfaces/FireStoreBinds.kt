@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FireStoreModule {
+abstract class FireStoreBinds {
     @Binds
     abstract fun bindsFireStore(fireStoreRepository : FireStoreRepository): IFireStoreRepository
 

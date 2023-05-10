@@ -7,10 +7,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+interface IGetDogListUseCase{
+    suspend operator fun invoke(): Flow<List<Dog>>
+    fun clearCache()
+}
+
 class GetDogListUseCase @Inject constructor(
     private val repository: IFireStoreRepository
-) {
-    suspend operator fun invoke(): Flow<List<Dog>> = flow {
+): IGetDogListUseCase{
+    override suspend operator fun invoke(): Flow<List<Dog>> = flow {
         while(true) {
             val dogs = repository.getDogCollection()
             emit(dogs)
@@ -18,5 +23,5 @@ class GetDogListUseCase @Inject constructor(
         }
     }
 
-    fun clearCache() = repository.clearCache()
+    override fun clearCache() = repository.clearCache()
 }

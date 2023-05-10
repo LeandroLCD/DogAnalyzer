@@ -59,8 +59,6 @@ fun CameraCompose(
         )
     }
     //endregion
-
-
     Surface(modifier = Modifier.fillMaxSize()) {
         if (hasCamPermission) {
             Column(Modifier.fillMaxSize()) {

@@ -9,14 +9,18 @@ import androidx.camera.view.PreviewView
 import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+interface ICameraX{
+    fun startCameraPreviewView(recognizerImage:(image:ImageProxy)->Unit): PreviewView
 
+
+}
 class CameraX @Inject constructor(
     private var context: Context,
     private var owner: LifecycleOwner,
     private val cameraExecutors: ExecutorService,
-) {
+): ICameraX {
 
-    fun startCameraPreviewView(recognizerImage:(image:ImageProxy)->Unit): PreviewView {
+    override fun startCameraPreviewView(recognizerImage:(image:ImageProxy)->Unit): PreviewView {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         val previewView = PreviewView(context)
 

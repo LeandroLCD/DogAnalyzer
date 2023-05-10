@@ -1,4 +1,4 @@
-package com.leandrolcd.doganalyzer.ui.authentication
+package com.leandrolcd.doganalyzer.ui
 
 import android.content.Intent
 import android.os.Build
@@ -32,10 +32,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
-import com.leandrolcd.doganalyzer.BuildConfig
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
 import com.leandrolcd.doganalyzer.ui.admob.removeInterstitial
+import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoginScreen
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.SignUpScreen
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.StartScreen
@@ -48,24 +48,23 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @ExperimentalCoilApi
-@ExperimentalMaterialApi
+@ExperimentalCoroutinesApi
 @ExperimentalMaterial3Api
+@ExperimentalMaterialApi
 @AndroidEntryPoint
-class LoginComposeActivity : ComponentActivity() {
-    lateinit var navigationController:NavHostController
-    private val loginViewModel: LoginComposeViewModel by viewModels()
+class MainActivity : ComponentActivity() {
     @Inject
     lateinit var interstitialAdMod: InterstitialAdMod
-    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-    val configSettings = remoteConfigSettings {
-        minimumFetchIntervalInSeconds = 30
+    lateinit var navigationController:NavHostController
+    private val loginViewModel: LoginComposeViewModel by viewModels()
+    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    private val configSettings = remoteConfigSettings {
+        minimumFetchIntervalInSeconds = 3600
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
-        val versionName = BuildConfig.VERSION_NAME
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {}
         interstitialAdMod.load(this)
@@ -153,7 +152,6 @@ class LoginComposeActivity : ComponentActivity() {
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
-        // There are no request codes
         val data: Intent? = result.data
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {

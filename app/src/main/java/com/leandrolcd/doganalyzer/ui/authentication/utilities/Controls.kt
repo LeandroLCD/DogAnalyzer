@@ -1,13 +1,12 @@
 package com.leandrolcd.doganalyzer.ui.authentication.utilities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
+import android.util.Xml
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,11 +43,14 @@ import com.leandrolcd.doganalyzer.LANGUAGE
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.isSpanish
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
-import com.leandrolcd.doganalyzer.ui.dogdetail.ItemDogR
 import com.leandrolcd.doganalyzer.ui.doglist.DogAnimation
 import com.leandrolcd.doganalyzer.ui.ui.theme.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import org.xmlpull.v1.XmlPullParser
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import kotlin.math.floor
 
 @Composable
@@ -259,6 +261,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 
 }
 
+@SuppressLint("ResourceType")
 @ExperimentalCoroutinesApi
 @Composable
 fun StartScreen(
@@ -278,22 +281,33 @@ fun StartScreen(
             if (task.isSuccessful) {
                 val versionMinima = remoteConfig.getString("version_minima")
                 urlPlayStore = remoteConfig.getString("url_play_store")
-                val compare= versionMinima.compareTo(BuildConfig.VERSION_NAME)
+                val compare = versionMinima.compareTo(BuildConfig.VERSION_NAME)
                 if (compare > 0) {
+                    val defaults = hashMapOf<String, Any>(
+                        "version_minima" to versionMinima,
+                        "url_play_store" to urlPlayStore
+                    )
+                    val inputStream = context.resources.openRawResource(R.xml.remote_config_defaults)
+                    val xmlBytes = inputStream.readBytes()
+                    val outputStream = context.openFileOutput("remote_config_defaults.xml", Context.MODE_PRIVATE)
+                    outputStream.write(xmlBytes)
+                    for ((key, value) in defaults) {
+                        outputStream.write("<entry>\n<key>$key</key>\n<value>$value</value>\n</entry>\n".toByteArray())
+                    }
+                    outputStream.flush()
+                    outputStream.close()
+                    inputStream.close()
                     isRequireUpdate = true
-                }
-                else
-                {
+                } else {
                     viewModel.onCheckedUserCurrent(navController)
                 }
-            }else{
+            } else {
                 viewModel.onCheckedUserCurrent(navController)
             }
-
         }
         delay(2000)
-
     }
+
     Box(Modifier.fillMaxSize()){
         LoadingScreen()
         UpdateDialog(isVisible = isRequireUpdate, onUpdateClicked={
@@ -355,60 +369,4 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
 }
 
 
-@Composable
-fun ScreenError(error: String) {
-    ConstraintLayout(
-        Modifier
-            .fillMaxSize()
-            .background(colorGray)
-    ) {
-        val (header, body, button) = createRefs()
-        val topGuide = createGuidelineFromTop(0.35f)
 
-
-        Box(modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth()
-            .fillMaxHeight(0.70f)
-            .constrainAs(body) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                shape = RoundedCornerShape(36.dp, 36.dp, 0.dp, 0.dp),
-                color = Color.White,
-                elevation = 8.dp,
-            ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                    Text(text = error, Modifier.padding(top = 46.dp))
-                }
-
-            }
-        }
-        Box(
-            modifier = Modifier
-                .size(220.dp)
-                .constrainAs(header) {
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
-                    bottom.linkTo(topGuide)
-                }, contentAlignment = Alignment.BottomCenter
-        ) {
-            DogAnimation()
-        }
-        Button(
-            onClick = { },
-            modifier = Modifier.constrainAs(button) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            colors = ButtonDefaults.buttonColors(primaryColor)
-        ) {
-            Text(text = stringResource(R.string.ok))
-        }
-
-    }
-}

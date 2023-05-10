@@ -4,9 +4,9 @@ import android.util.Patterns
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.EmailAuthProvider
 import com.leandrolcd.doganalyzer.domain.SignUpUseCase
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
-import com.leandrolcd.doganalyzer.ui.model.LoginUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -59,10 +59,21 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun onSignUpClicked() {
+        val currentUser = signUpUseCase.getUser()
         uiStatus.value = UiStatus.Loading()
         viewModelScope.launch {
-
-            uiStatus.value = signUpUseCase(LoginUser(email.value,password.value))
+            if (currentUser != null && currentUser.isAnonymous) {
+                val credential = EmailAuthProvider.getCredential(email.value, password.value)
+                currentUser.linkWithCredential(credential).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        uiStatus.value = UiStatus.Success(Unit)
+                    } else {
+                        uiStatus.value = UiStatus.Error(task.exception?.message ?: "Unknown error")
+                    }
+                }
+            } else {
+                uiStatus.value = UiStatus.Error("User is not anonymous or user is null")
+            }
 
         }
     }

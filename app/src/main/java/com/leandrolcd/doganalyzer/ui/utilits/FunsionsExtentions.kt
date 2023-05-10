@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.leandrolcd.doganalyzer
 
 import android.content.Context

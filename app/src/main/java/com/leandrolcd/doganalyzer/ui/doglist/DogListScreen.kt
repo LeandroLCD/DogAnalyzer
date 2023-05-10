@@ -102,6 +102,7 @@ fun DogListScreen(
 
 }
 
+@ExperimentalCoroutinesApi
 @RequiresApi(Build.VERSION_CODES.R)
 @ExperimentalMaterial3Api
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

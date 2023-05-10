@@ -22,6 +22,7 @@ interface IFireStoreRepository{
     suspend fun getDogById(id:String):UiStatus<Dog>
     fun clearCache()
     suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>>
+    suspend fun synchronizeNow()
 }
 
 class FireStoreRepository @Inject constructor(
@@ -99,6 +100,28 @@ class FireStoreRepository @Inject constructor(
 
         }
     }
+
+    override suspend fun synchronizeNow() {
+
+
+                withContext(dispatcher){
+
+                    val list = fireStore.getDogListUser()
+                    if(dogIdUser.isNotEmpty()){
+                    dogIdUser.map {
+                        if(!list.contains(it)){
+                            addDogToUser(it)
+                        }else{
+                            dogIdUser.remove(it)
+                        }
+                    }
+
+                }
+                    dogIdUser.addAll(list)
+            }
+
+    }
+
     private fun getCollectionList(allDogList: List<DogDTO>, userDogList: List<String>): List<Dog> {
         val dog = allDogList.toDogList().map {
             if (userDogList.contains(it.mlId)) {

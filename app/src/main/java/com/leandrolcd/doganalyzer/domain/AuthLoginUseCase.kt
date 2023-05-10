@@ -7,20 +7,34 @@ import com.leandrolcd.doganalyzer.ui.model.LoginUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+interface IAuthLoginUseCase{
+    suspend operator fun invoke(user: LoginUser): UiStatus<Any>
+
+    fun getUser():FirebaseUser?
+
+    fun logout()
+     suspend fun onSignInAnonymously(): FirebaseUser?
+
+
+}
 @ExperimentalCoroutinesApi
 class AuthLoginUseCase @Inject constructor(
                        private val repository: LoginRepository
-) {
-    suspend operator fun invoke(user: LoginUser): UiStatus<Any> {
+): IAuthLoginUseCase {
+    override suspend operator fun invoke(user: LoginUser): UiStatus<Any> {
         return repository.authLogin(user)
     }
 
-    fun getUser():FirebaseUser?{
+    override fun getUser():FirebaseUser?{
         return repository.getUser()
     }
 
-    fun logout(){
+    override fun logout(){
         repository.logout()
+    }
+
+    override suspend fun onSignInAnonymously(): FirebaseUser? {
+        return repository.onSignInAnonymously()
     }
 
 }

@@ -66,6 +66,7 @@ fun SignUpScreen(
 }
 
 
+@ExperimentalCoroutinesApi
 @Composable
 fun CardSignUp(viewModel: SignUpViewModel, navigationController: NavHostController) {
     val configuration = LocalConfiguration.current
@@ -109,6 +110,7 @@ fun CardSignUp(viewModel: SignUpViewModel, navigationController: NavHostControll
 }
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun MyFooter(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {

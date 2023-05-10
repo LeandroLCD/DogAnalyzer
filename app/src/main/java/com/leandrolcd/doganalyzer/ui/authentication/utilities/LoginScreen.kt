@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.R
@@ -44,7 +45,7 @@ import kotlin.math.floor
 @Composable
 fun LoginScreen(
     navigationController: NavHostController,
-    viewModel: LoginComposeViewModel,
+    viewModel: LoginComposeViewModel = hiltViewModel(),
     onLoginWithGoogleClicked: () -> Unit
 ) {
 
@@ -87,6 +88,7 @@ fun LoginContent(
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun MyCardLogin(
     viewModel: LoginComposeViewModel,
@@ -175,6 +177,7 @@ fun HeaderLogin(modifier: Modifier, isPlaying: Boolean, stopPlaying: () -> Unit)
 }
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun FooterLogin(
     modifier: Modifier = Modifier,
@@ -202,6 +205,7 @@ fun FooterLogin(
 
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun BodyLogin(
     modifier: Modifier = Modifier,

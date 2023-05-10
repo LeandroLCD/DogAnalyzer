@@ -35,5 +35,6 @@
     <string name="update_require_es">Para continuar es necesario instalar la última actualización</string>
     <string name="update_require_en">To continue it is required to install the latest update</string>
     <string name="update">Update</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>
