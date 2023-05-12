@@ -43,6 +43,7 @@ import com.leandrolcd.doganalyzer.ui.dogdetail.DogDetailScreen
 import com.leandrolcd.doganalyzer.ui.doglist.DogListScreen
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
+import com.leandrolcd.doganalyzer.ui.perfil.ProfileScreen
 import com.leandrolcd.doganalyzer.ui.ui.theme.DogedexMVVMTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -105,6 +106,7 @@ class MainActivity : ComponentActivity() {
                     onLoginWithGoogleClicked()
                 }
             }
+            composable(route = Routes.ScreenProfile.route) { ProfileScreen(navController = navigationController) }
 
             composable(route = Routes.ScreenSignUp.route) { SignUpScreen(navigationController) }
 

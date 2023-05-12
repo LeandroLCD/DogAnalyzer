@@ -2,6 +2,7 @@ package com.leandrolcd.doganalyzer.data.network
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
@@ -16,17 +17,17 @@ class FireStoreService @Inject constructor(
     @SuppressLint("SuspiciousIndentation")
     suspend fun getDogListApp(): List<DogDTO> {
         val dogList = mutableListOf<DogDTO>()
-            val querySnapshot = fireStore.collection("DogListApp")
-                .get()
-                .await()
+        val querySnapshot = fireStore.collection("DogListApp")
+            .get()
+            .await()
 
-                    Log.d("TAG", "getDogListApp: ${querySnapshot.documents}")
-                    for (document in querySnapshot.documents) {
-                        val dog = document.toObject<DogDTO>()
-                        dog?.let {
-                            dogList.add(it)
-                        }
-                    }
+        Log.d("TAG", "getDogListApp: ${querySnapshot.documents}")
+        for (document in querySnapshot.documents) {
+            val dog = document.toObject<DogDTO>()
+            dog?.let {
+                dogList.add(it)
+            }
+        }
 
         return dogList
     }
@@ -34,7 +35,8 @@ class FireStoreService @Inject constructor(
     suspend fun getDogListUser(): List<String> {
         val user = loginService.getUser()
         val querySnapshot = user?.uid?.let { uid ->
-            val db = fireStore.collection("Users").document(uid)  //..collection("DogList")document(uid)
+            val db =
+                fireStore.collection("Users").document(uid)  //..collection("DogList")document(uid)
             db.get().await()
         }
         val dogList = mutableListOf<String>()
@@ -47,6 +49,32 @@ class FireStoreService @Inject constructor(
         }
         return dogList
     }
+
+    suspend fun deleteUser(uid: String) {
+        val db = fireStore
+        val batch = db.batch()
+
+        // Eliminar la lista de perros del usuario, si existe
+        val userDocRef = db.collection("Users").document(uid)
+        val userSnapshot = userDocRef.get().await()
+        if (userSnapshot.exists()) {
+            val dogList = userSnapshot.get("DogList") as? ArrayList<String>
+            dogList?.let {
+                batch.update(userDocRef, "DogList", FieldValue.delete())
+                it.forEach { dogId ->
+                    val dogDocRef = db.collection("Dogs").document(dogId)
+                    batch.delete(dogDocRef)
+                }
+            }
+        }
+
+        // Eliminar el documento del usuario
+        batch.delete(userDocRef)
+
+        // Ejecutar las operaciones en lote
+        batch.commit().await()
+    }
+
 
     suspend fun addDogIdToUser(dogId: String): Boolean {
         val user = loginService.getUser()
@@ -67,7 +95,7 @@ class FireStoreService @Inject constructor(
             val dogList = snapshot.get("DogList") as? ArrayList<String> ?: arrayListOf()
 
             // Agrega el nuevo elemento a la lista existente si no existe el dog
-            if (!dogList.contains(dogId)){
+            if (!dogList.contains(dogId)) {
                 dogList.add(dogId)
                 // Actualiza el documento en Firestore
                 db.update("DogList", dogList).await()
@@ -85,14 +113,15 @@ class FireStoreService @Inject constructor(
     }
 
     suspend fun getDogById(mlId: String): DogDTO {
-        val querySnapshot = fireStore.collection("DogListApp").whereEqualTo("mlId", mlId).get().await()
+        val querySnapshot =
+            fireStore.collection("DogListApp").whereEqualTo("mlId", mlId).get().await()
         if (querySnapshot.isEmpty) {
-           throw Exception("No se encontró ningún documento con mlId")
+            throw Exception("No se encontró ningún documento con mlId")
         }
 
-            val docSnapshot = querySnapshot.documents.first()
-            val dog = docSnapshot.toObject<DogDTO>()
-            return dog ?: DogDTO()
+        val docSnapshot = querySnapshot.documents.first()
+        val dog = docSnapshot.toObject<DogDTO>()
+        return dog ?: DogDTO()
 
     }
 
@@ -106,12 +135,12 @@ class FireStoreService @Inject constructor(
             throw Exception("No se encontró ningún documento con mlId")
         }
 
-            val dogList = mutableListOf<DogDTO>()
-            for (document in querySnapshot) {
-                val dog = document.toObject(DogDTO::class.java)
-                dogList.add(dog)
-            }
-            return dogList
+        val dogList = mutableListOf<DogDTO>()
+        for (document in querySnapshot) {
+            val dog = document.toObject(DogDTO::class.java)
+            dogList.add(dog)
+        }
+        return dogList
 
     }
 

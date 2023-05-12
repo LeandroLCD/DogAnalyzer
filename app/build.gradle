@@ -106,6 +106,9 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
 
+    //region dataStore
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
+    //endregion
     //region Animation
     implementation "com.airbnb.android:lottie-compose:4.0.0"
     //endregion

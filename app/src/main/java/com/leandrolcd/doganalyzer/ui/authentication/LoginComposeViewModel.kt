@@ -17,9 +17,7 @@ import com.leandrolcd.doganalyzer.ui.model.LoginUser
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -30,7 +28,7 @@ class LoginComposeViewModel @Inject constructor(
 ): ViewModel() {
 
     //region Properties
-    var email = mutableStateOf<String>("")
+    var email = mutableStateOf("")
         private set
 
     var isDialogForgot = mutableStateOf(false)
@@ -80,7 +78,7 @@ class LoginComposeViewModel @Inject constructor(
                                 currentUser.delete().addOnSuccessListener {
                                     viewModelScope.launch {
                                         uiStatus.value =  repository.authLoginWithGoogle(idToken)
-                                        fireStore.synchronizeNow()
+                                        fireStore.synchronizeNow(currentUser.uid)
                                         onNavigate(navHostController)
                                     }
                                 }
@@ -120,18 +118,18 @@ class LoginComposeViewModel @Inject constructor(
         uiStatus.value = UiStatus.Loaded()
     }
     fun onCheckedUserCurrent(navHostController: NavHostController) {
-        repository.getUser()?.let { user ->
+        viewModelScope.launch {
+            repository.getUser()?.let { user ->
             userCurrent.value = user
-        }
-        if(userCurrent.value == null){
-            viewModelScope.launch {
-                userCurrent.value = repository.onSignInAnonymously()
             }
+            if(userCurrent.value == null){
+                userCurrent.value = repository.onSignInAnonymously()
 
+            }
+            dogListNavigate(navHostController)
         }
 
-            navHostController.popBackStack()
-            navHostController.navigate(Routes.ScreenDogList.route)
+
 
     }
     fun onForgotPassword(email: String, context: Context){
@@ -158,7 +156,12 @@ class LoginComposeViewModel @Inject constructor(
     fun onDismissDialog(dismiss: Boolean = false) {
         isDialogForgot.value = dismiss
     }
-
+    private suspend fun dogListNavigate(navHostController: NavHostController){
+        withContext(Dispatchers.Main){
+            navHostController.popBackStack()
+            navHostController.navigate(Routes.ScreenDogList.route)
+        }
+    }
     //endregion
 
 }
