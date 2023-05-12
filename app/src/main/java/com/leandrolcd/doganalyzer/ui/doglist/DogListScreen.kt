@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.outlined.Logout
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
@@ -121,7 +121,7 @@ fun DogListContent(
 
     Scaffold(
         topBar = {
-            MyTopBar { viewModel.logout() }
+            MyTopBar { navHostController.navigate(Routes.ScreenProfile.route) }
         },
         bottomBar = {
             MyBottomBar(index) {
@@ -278,7 +278,7 @@ fun MyTopBar(onClick: () -> Unit) {
         actions = {
             IconButton(onClick = { onClick() }) {
                 Icon(
-                    imageVector = Icons.Outlined.Logout,
+                    imageVector = Icons.Outlined.Person,
                     contentDescription = stringResource(R.string.logout)
                 )
             }

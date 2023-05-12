@@ -1,5 +1,6 @@
 package com.leandrolcd.doganalyzer.data.repositoty
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.leandrolcd.doganalyzer.data.dto.NetworkCallAnswer
@@ -30,6 +31,7 @@ class LoginRepository @Inject constructor(private val loginService: LoginService
 
         }
 
+    @SuppressLint("SuspiciousIndentation")
     suspend fun authLogin(user: LoginUser): UiStatus<Any> =
 
         suspendCancellableCoroutine { continuation ->
@@ -58,6 +60,7 @@ class LoginRepository @Inject constructor(private val loginService: LoginService
 
     fun logout(){
         loginService.signOut()
+
     }
 
     suspend fun authLoginWithGoogle(idToken: String): UiStatus<Any> =

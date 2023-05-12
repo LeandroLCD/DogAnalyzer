@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Xml
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -32,7 +30,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -43,14 +40,9 @@ import com.leandrolcd.doganalyzer.LANGUAGE
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.isSpanish
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
-import com.leandrolcd.doganalyzer.ui.doglist.DogAnimation
 import com.leandrolcd.doganalyzer.ui.ui.theme.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import org.xmlpull.v1.XmlPullParser
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import kotlin.math.floor
 
 @Composable
@@ -127,7 +119,7 @@ fun EmailFields(
             errorBorderColor = Color.Red,
             focusedBorderColor = primaryColor,
             unfocusedBorderColor = Color.Transparent,
-            backgroundColor = backGroupTextField.toAlpha(0.6f)
+            backgroundColor = backGroupTextField.toAlpha(0.8f)
         ),
         shape = RoundedCornerShape(8.dp),
         modifier = modifier
@@ -190,7 +182,7 @@ fun PasswordFields(
             errorBorderColor = Color.Red,
             focusedBorderColor = primaryColor,
             unfocusedBorderColor = Color.Transparent,
-            backgroundColor = backGroupTextField.toAlpha(0.6f)
+            backgroundColor = backGroupTextField.toAlpha(0.8f)
         ),
         shape = RoundedCornerShape(8.dp),
         modifier = modifier
@@ -277,7 +269,7 @@ fun StartScreen(
     }
     val context = LocalContext.current
     LaunchedEffect(true) {
-        remoteConfig.fetchAndActivate().addOnCompleteListener { task->
+        remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val versionMinima = remoteConfig.getString("version_minima")
                 urlPlayStore = remoteConfig.getString("url_play_store")
@@ -287,9 +279,11 @@ fun StartScreen(
                         "version_minima" to versionMinima,
                         "url_play_store" to urlPlayStore
                     )
-                    val inputStream = context.resources.openRawResource(R.xml.remote_config_defaults)
+                    val inputStream =
+                        context.resources.openRawResource(R.xml.remote_config_defaults)
                     val xmlBytes = inputStream.readBytes()
-                    val outputStream = context.openFileOutput("remote_config_defaults.xml", Context.MODE_PRIVATE)
+                    val outputStream =
+                        context.openFileOutput("remote_config_defaults.xml", Context.MODE_PRIVATE)
                     outputStream.write(xmlBytes)
                     for ((key, value) in defaults) {
                         outputStream.write("<entry>\n<key>$key</key>\n<value>$value</value>\n</entry>\n".toByteArray())
@@ -305,15 +299,14 @@ fun StartScreen(
                 viewModel.onCheckedUserCurrent(navController)
             }
         }
-        delay(2000)
     }
 
-    Box(Modifier.fillMaxSize()){
+    Box(Modifier.fillMaxSize()) {
         LoadingScreen()
-        UpdateDialog(isVisible = isRequireUpdate, onUpdateClicked={
+        UpdateDialog(isVisible = isRequireUpdate, onUpdateClicked = {
 
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlPlayStore))
-            startActivity(context,intent, null)
+            startActivity(context, intent, null)
 
         })
     }

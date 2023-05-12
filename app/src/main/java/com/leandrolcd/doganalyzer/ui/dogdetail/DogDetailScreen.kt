@@ -4,7 +4,6 @@ package com.leandrolcd.doganalyzer.ui.dogdetail
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -69,7 +67,7 @@ fun DogDetailScreen(
         is UiStatus.Loaded -> {
             viewModel.getDogsById(dogList)
             val context = LocalContext.current as Activity
-            interstitialShow(isRecognition, context){
+            interstitialShow(isRecognition, context) {
                 viewModel.interstitialShow(context)
             }
         }
@@ -158,14 +156,14 @@ fun DogScaffold(
         DogDialog(isVisible = isVisible, dogList = dogs,
             onDismissRequest = {
                 val click = activity.setDetailClick()
-                if (click % 5 == 0 ) {
+                if (click % 5 == 0) {
                     viewModel.interstitialShow(activity)
                 }
                 isVisible = false
             }, onSelectItems = {
                 dog = it
                 val click = activity.setDetailClick()
-                if (click % 5 == 0 ) {
+                if (click % 5 == 0) {
                     viewModel.interstitialShow(activity)
                 }
 
@@ -177,22 +175,20 @@ fun DogScaffold(
 fun interstitialShow(
     isRecognition: Boolean,
     context: Context,
-    Show: ()->Unit
+    Show: () -> Unit
 ) {
 
-    if(isRecognition){
+    if (isRecognition) {
         val click = context.setRecognitionClick()
-            if (click % 2 == 0 ) {
-                Show()
-            }
-    }else{
+        if (click % 2 == 0) {
+            Show()
+        }
+    } else {
         val click = context.setDetailClick()
-        if (click % 5 == 0 ) {
+        if (click % 5 == 0) {
             Show()
         }
     }
-
-
 
 
 }
@@ -335,8 +331,8 @@ fun MyTopAppBar(
 
 @Composable
 fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
-    val currentLocale = LocalConfiguration.current.locales[0]
-    val language = currentLocale.language
+
+    val language = LANGUAGE
     BottomAppBar(
         modifier = Modifier.background(Color.White),
         backgroundColor = primaryColor,
@@ -404,7 +400,7 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
                     .fillMaxWidth()
                     .padding(top = 24.dp),
                 text = dog.name,
-                fontSize = if(dog.name.length < 16) 32.sp else 22.sp,
+                fontSize = if (dog.name.length < 16) 32.sp else 22.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black,
                 textAlign = TextAlign.Center
@@ -545,7 +541,7 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TextTitle(
+fun TextTitle(
     textSp: String,
     textEn: String,
     fontSize: TextUnit = 16.sp,
@@ -568,11 +564,13 @@ private fun TextTitle(
 }
 
 @Composable
-private fun TextDescription(
+fun TextDescription(
     textSp: String,
     textEn: String,
     modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Start,
+    fontSize: TextUnit = 16.sp,
+    color: Color = textColor
 ) {
     Text(
         text = if (LANGUAGE.isSpanish()) {
@@ -580,8 +578,8 @@ private fun TextDescription(
         } else {
             textEn
         },
-        fontSize = 16.sp,
-        color = textColor,
+        fontSize = fontSize,
+        color = color,
         textAlign = textAlign,
         modifier = modifier
     )

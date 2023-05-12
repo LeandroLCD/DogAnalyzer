@@ -3,6 +3,7 @@ package com.leandrolcd.doganalyzer.ui.camera
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.leandrolcd.doganalyzer.opacity
 import com.leandrolcd.doganalyzer.ui.camera.utils.Commons.REQUIRED_PERMISSIONS
 import com.leandrolcd.doganalyzer.ui.doglist.DogListViewModel
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
@@ -79,7 +79,13 @@ fun CameraCompose(
 
 @Composable
 fun ButtonCamera(enabled: Boolean = true, onCaptureClick: () -> Unit) {
-    FloatingActionButton(onClick = { }, backgroundColor = Color.Transparent) {
+    FloatingActionButton(
+        onClick = { },
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.background(
+            Color.Transparent
+        )
+    ) {
         if (enabled) {
             Icon(imageVector = Icons.Sharp.Camera,
                 contentDescription = "Capture dog",
@@ -92,7 +98,7 @@ fun ButtonCamera(enabled: Boolean = true, onCaptureClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Sharp.Camera,
                 contentDescription = "Capture dog",
-                tint = primaryColor.opacity(0.5f),
+                tint = Color.Gray,
                 modifier = Modifier
                     .width(60.dp)
                     .height(60.dp)

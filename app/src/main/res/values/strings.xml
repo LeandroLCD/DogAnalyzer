@@ -36,5 +36,12 @@
     <string name="update_require_en">To continue it is required to install the latest update</string>
     <string name="update">Update</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="account_Es">Cuenta:</string>
+    <string name="account_En">Account:</string>
+    <string name="croquettes_Es">Croquetas:</string>
+    <string name="croquettes_En">Croquettes:</string>
+    <string name="logout_Es">Cerrar Sesión</string>
+    <string name="link_account_En">Link Account</string>
+    <string name="link_account_Es">Vincular Cuenta</string>
 
 </resources>
