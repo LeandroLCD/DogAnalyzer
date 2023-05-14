@@ -1,8 +1,8 @@
 package com.leandrolcd.doganalyzer.core.camera
 
 import android.content.Context
-import com.leandrolcd.doganalyzer.LABEL_PATH
-import com.leandrolcd.doganalyzer.MODEL_PATH
+import com.leandrolcd.doganalyzer.ui.utilits.LABEL_PATH
+import com.leandrolcd.doganalyzer.ui.utilits.MODEL_PATH
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

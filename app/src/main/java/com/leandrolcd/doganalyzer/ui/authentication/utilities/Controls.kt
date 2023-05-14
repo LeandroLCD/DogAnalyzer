@@ -36,7 +36,7 @@ import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.leandrolcd.doganalyzer.BuildConfig
-import com.leandrolcd.doganalyzer.LANGUAGE
+import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.isSpanish
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel

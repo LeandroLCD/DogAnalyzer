@@ -9,7 +9,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.leandrolcd.doganalyzer.IS_DEBUG
+import com.leandrolcd.doganalyzer.ui.utilits.IS_DEBUG
 import com.leandrolcd.doganalyzer.R
 import javax.inject.Inject
 

@@ -46,6 +46,7 @@ import com.leandrolcd.doganalyzer.ui.ui.theme.Purple200
 import com.leandrolcd.doganalyzer.ui.ui.theme.colorGray
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
 import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
+import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
 import kotlin.math.floor
 
 @ExperimentalCoilApi
@@ -134,7 +135,7 @@ fun DogScaffold(
         floatingActionButton = {
             MyFab() {
                 if (isRecognition) {
-                    viewModel.addDogToUser(dogId)
+                    viewModel.addDogToUser(dogId, 2)
                 } else {
                     navController.popBackStack()
                 }
@@ -205,24 +206,7 @@ fun DogDialog(
     if (isVisible) {
         AlertDialog(onDismissRequest = { onDismissRequest() },
             title = {
-                Row(
-                    modifier = Modifier.padding(bottom = 24.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Pets,
-                        contentDescription = stringResource(id = R.string.dog_image),
-                        tint = Purple200,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.top_score),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Purple200
-                    )
-                }
+                TitleDialog(text = stringResource(R.string.top_score), Modifier.padding(bottom = 24.dp))
             },
             text = {
                 LazyColumn(content = {
@@ -239,6 +223,28 @@ fun DogDialog(
         )
     }
 
+}
+
+@Composable
+fun TitleDialog(text: String, modifier: Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Pets,
+            contentDescription = stringResource(id = R.string.dog_image),
+            tint = Purple200,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Purple200
+        )
+    }
 }
 
 @Composable

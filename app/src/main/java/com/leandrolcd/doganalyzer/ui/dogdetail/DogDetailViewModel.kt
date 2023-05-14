@@ -49,10 +49,10 @@ class DogDetailViewModel @Inject constructor(
             }
         }
     }
-    fun addDogToUser(dogId: String){
+    fun addDogToUser(dogId: String, croquettes: Int){
         uiStatus.value = UiStatus.Loading()
         viewModelScope.launch {
-            val resp = repository.addDogToUser(dogId)
+            val resp = repository.addDogToUser(dogId, croquettes)
             if(resp is Error) {
                 uiStatus.value = Error(resp.message)
             }else if(resp is Success){
@@ -68,7 +68,6 @@ class DogDetailViewModel @Inject constructor(
         navHostController = navController
 
     }
-
     fun interstitialShow(activity: Activity) {
         interstitialAdMod.show(activity) {
             Log.d("TAG", "interstitialShow: ViewModelShow")

@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Dog(
     var mlId: String = "",
+    val croquettes:Int = 0,
     val curiosities: String = "",
     val curiositiesEs: String = "",
     val heightFemale: String = "",
