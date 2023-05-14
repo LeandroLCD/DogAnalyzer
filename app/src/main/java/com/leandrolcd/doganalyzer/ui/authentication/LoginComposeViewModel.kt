@@ -100,7 +100,6 @@ class LoginComposeViewModel @Inject constructor(
 
     }
 
-
     private fun onNavigate(navHostController: NavHostController){
     if(uiStatus.value is UiStatus.Success){
         navHostController.popBackStack()
