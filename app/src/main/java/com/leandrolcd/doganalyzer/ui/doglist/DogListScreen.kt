@@ -1,8 +1,8 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,14 +20,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -40,13 +40,17 @@ import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
 import com.leandrolcd.doganalyzer.ui.camera.ButtonCamera
 import com.leandrolcd.doganalyzer.ui.camera.CameraCompose
+import com.leandrolcd.doganalyzer.ui.dogdetail.TextDescription
+import com.leandrolcd.doganalyzer.ui.dogdetail.TitleDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
+import com.leandrolcd.doganalyzer.ui.ui.theme.Marron
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
 import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+
 
 @ExperimentalCoroutinesApi
 @RequiresApi(Build.VERSION_CODES.R)
@@ -70,6 +74,15 @@ fun DogListScreen(
             viewModel.uiStatus.collect { value = it }
         }
     }
+    val croquettesCount by produceState(
+        initialValue = 0,
+        key1 = lifecycle,
+        key2 = viewModel
+    ) {
+        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+            viewModel.croquettes.collect { value = it }
+        }
+    }
 
     when (uiState) {
         is UiStatus.Error -> {
@@ -88,6 +101,7 @@ fun DogListScreen(
             DogListContent(
                 navHostController,
                 dogList = (uiState as UiStatus.Success<List<Dog>>).data,
+                croquettesCount = croquettesCount,
                 viewModel = viewModel
             ) {
                 navHostController.navigate(
@@ -105,23 +119,28 @@ fun DogListScreen(
 @ExperimentalCoroutinesApi
 @RequiresApi(Build.VERSION_CODES.R)
 @ExperimentalMaterial3Api
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalMaterialApi
 @Composable
 fun DogListContent(
     navHostController: NavHostController, viewModel: DogListViewModel,
     dogList: List<Dog>,
-    onItemSelected: (Dog) -> Unit,
+    croquettesCount: Int,
+    onItemSelected: (Dog) -> Unit
 
-    ) {
+) {
     var index by remember {
         mutableStateOf(0)
     }
     var isBanner by remember { mutableStateOf(false) }
-
+    var isVisible by remember { mutableStateOf(false) }
+    var dogSelect by remember { mutableStateOf<Dog?>(null) }
+    val context = LocalContext.current
     Scaffold(
         topBar = {
-            MyTopBar { navHostController.navigate(Routes.ScreenProfile.route) }
+            MyTopBar(croquettes = croquettesCount) {
+                navHostController.navigate(Routes.ScreenProfile.route)
+            }
+
         },
         bottomBar = {
             MyBottomBar(index) {
@@ -132,7 +151,7 @@ fun DogListContent(
         floatingActionButton = {
             if (index == 1) {
                 val dog = viewModel.dogRecognition.value.first()
-                ButtonCamera(dog.confidence > 75) {
+                ButtonCamera(dog.confidence > 60) {
                     navHostController.navigate(
                         Routes.ScreenDogDetail.routeName(
                             true,
@@ -145,19 +164,20 @@ fun DogListContent(
         },
         isFloatingActionButtonDocked = true
     ) {
-        var areaSize by remember { mutableStateOf(Size.Zero) }
         if (index == 0) {
 
             Box(
                 Modifier
                     .fillMaxSize()
                     .padding(it)
-                    .onGloballyPositioned { layoutCoordinates ->
-                        areaSize = layoutCoordinates.size.toSize()
-                    }) {
+            ) {
                 DogCollection(
                     dogList,
-                    modifier = Modifier.padding(bottom = if (isBanner) 50.dp else 0.dp)
+                    modifier = Modifier.padding(bottom = if (isBanner) 50.dp else 0.dp),
+                    onUnCoverRequest = { select ->
+                        isVisible = true
+                        dogSelect = select
+                    }
                 ) { dog ->
                     onItemSelected(dog)
                 }
@@ -169,8 +189,8 @@ fun DogListContent(
                         .background(Color.Transparent),
                     horizontalArrangement = Arrangement.Center,
 
-                ) {
-                    BannerAdView() {
+                    ) {
+                    BannerAdView {
                         isBanner = true
                     }
 
@@ -183,14 +203,29 @@ fun DogListContent(
             CameraCompose()
 
         }
-
+        StoreDialog(
+            isVisible = isVisible,
+            onDismissRequest = { isVisible = false },
+            arrayCroquettes = arrayOf(dogSelect?.croquettes ?: 0, croquettesCount)
+        ) {
+            if (dogSelect != null && croquettesCount > (dogSelect?.croquettes ?: 0)) {
+                viewModel.onUnCoverRequest(dogSelect!!.mlId)
+            } else {
+                Toast.makeText(context, "Insufficient Croquettes", Toast.LENGTH_LONG).show()
+            }
+        }
 
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun DogCollection(dogList: List<Dog>, modifier: Modifier, onItemSelected: (Dog) -> Unit) {
+fun DogCollection(
+    dogList: List<Dog>,
+    modifier: Modifier,
+    onUnCoverRequest: (Dog) -> Unit,
+    onItemSelected: (Dog) -> Unit
+) {
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -199,7 +234,7 @@ fun DogCollection(dogList: List<Dog>, modifier: Modifier, onItemSelected: (Dog) 
             .background(Color.Transparent),
         content = {
             items(dogList) {
-                ItemDog(it, onItemSelected)
+                ItemDog(it, onItemSelected, onUnCoverRequest)
             }
         },
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -210,47 +245,49 @@ fun DogCollection(dogList: List<Dog>, modifier: Modifier, onItemSelected: (Dog) 
 
 @ExperimentalMaterialApi
 @Composable
-fun ItemDog(dog: Dog, onItemSelected: (Dog) -> Unit) = if (dog.inCollection) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .height(100.dp)
-            .width(100.dp),
-        onClick = {
-            onItemSelected(dog)
-        },
-        shape = RoundedCornerShape(16.dp),
-        elevation = 8.dp
-    ) {
-        SubcomposeAsyncImage(contentDescription = stringResource(R.string.dog_image),
-            modifier = Modifier.background(Color.White),
-            model = dog.imageUrl,
-            loading = {
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .height(45.dp)
-                            .width(45.dp)
-                    )
-                }
-            })
+fun ItemDog(dog: Dog, onItemSelected: (Dog) -> Unit, onUnCoverRequest: (Dog) -> Unit) =
+    if (dog.inCollection) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .height(100.dp)
+                .width(100.dp),
+            onClick = {
+                onItemSelected(dog)
+            },
+            shape = RoundedCornerShape(16.dp),
+            elevation = 8.dp
+        ) {
+            SubcomposeAsyncImage(contentDescription = stringResource(R.string.dog_image),
+                modifier = Modifier.background(Color.White),
+                model = dog.imageUrl,
+                loading = {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .height(45.dp)
+                                .width(45.dp)
+                        )
+                    }
+                })
+        }
+
+    } else {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .height(100.dp)
+                .width(100.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = 16.dp,
+            onClick = { onUnCoverRequest(dog) }
+        ) {
+
+            Text(text = "${dog.index}", Modifier.padding(horizontal = 8.dp))
+            DogAnimation()
+
+        }
     }
-
-} else {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .height(100.dp)
-            .width(100.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = 16.dp
-    ) {
-
-        Text(text = "${dog.index}", Modifier.padding(horizontal = 8.dp))
-        DogAnimation()
-
-    }
-}
 
 @Composable
 fun DogAnimation() {
@@ -269,13 +306,23 @@ fun DogAnimation() {
 }
 
 @Composable
-fun MyTopBar(onClick: () -> Unit) {
+fun MyTopBar(croquettes: Int = 0, onClick: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.Title)) },
         backgroundColor = primaryColor,
         contentColor = Color.White,
         elevation = 8.dp,
         actions = {
+
+            Row {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.croquette), contentDescription = "",
+                    tint = Marron, modifier = Modifier.size(20.dp)
+                )
+                Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+            }
+
             IconButton(onClick = { onClick() }) {
                 Icon(
                     imageVector = Icons.Outlined.Person,
@@ -315,5 +362,48 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
                 text = "Camera"
             )
         }, unselectedContentColor = textColor)
+    }
+}
+
+@Composable
+fun StoreDialog(
+    isVisible: Boolean,
+    arrayCroquettes: Array<Int>,
+    onDismissRequest: () -> Unit,
+    onUnCoverRequest: () -> Unit
+) {
+
+    if (isVisible) {
+        AlertDialog(onDismissRequest = { onDismissRequest() },
+            title = {
+                TitleDialog(text = stringResource(R.string.dog_store), Modifier)
+            },
+            text = {
+                TextDescription(
+                    textSp = stringResource(
+                        id = R.string.store_description_Es,
+                        formatArgs = arrayCroquettes
+                    ),
+                    textEn = stringResource(
+                        R.string.store_description_En,
+                        formatArgs = arrayCroquettes
+                    ),
+                    fontSize = 16.sp, textAlign = TextAlign.Justify
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onUnCoverRequest()
+                    onDismissRequest()
+                }) {
+                    Text(text = stringResource(R.string.uncover))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismissRequest() }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            })
+
     }
 }

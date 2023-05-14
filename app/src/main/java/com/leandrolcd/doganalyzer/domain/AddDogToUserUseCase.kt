@@ -7,7 +7,7 @@ import javax.inject.Inject
 class AddDogToUserUseCase @Inject constructor(
     private val repository: FireStoreRepository
 )  {
-    suspend operator fun invoke(dog: Dog) {
-        dog.mlId.let { repository.addDogToUser(it) }
+    suspend operator fun invoke(dog: Dog, croquettes: Int) {
+        dog.mlId.let { repository.addDogToUser(it, croquettes) }
     }
 }

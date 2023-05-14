@@ -24,7 +24,7 @@ private val dataStore: IFireStoreRepository):ViewModel() {
    var dogCollection: StateFlow<Int>
    private set
 
-    var croquettes: StateFlow<Int>
+    lateinit var croquettes: StateFlow<Int>
     private set
 
      init {
@@ -32,8 +32,11 @@ private val dataStore: IFireStoreRepository):ViewModel() {
          dogCollection =
              getDogUser().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-         croquettes =
-             getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+         viewModelScope.launch {
+             croquettes =
+                 dataStore.getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+         }
 
 
 
@@ -44,7 +47,7 @@ private val dataStore: IFireStoreRepository):ViewModel() {
             loginRepository.logout()
             dataStore.clearCache()
             dataStore.getCroquettes().apply {
-                    dataStore.setCroquettes(this *- 1)
+                    dataStore.setCroquettes(this.first() *- 1)
                 }
             }
 
@@ -60,10 +63,7 @@ private val dataStore: IFireStoreRepository):ViewModel() {
 
               emit(count)
         }
-    private fun  getCroquettes(): Flow<Int> = flow{
 
-        emit(dataStore.getCroquettes())
-    }
 
 }
 

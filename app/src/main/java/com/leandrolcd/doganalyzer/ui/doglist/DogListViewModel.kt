@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
-import com.leandrolcd.doganalyzer.domain.IAuthLoginUseCase
 import com.leandrolcd.doganalyzer.domain.IGetDogListUseCase
 import com.leandrolcd.doganalyzer.ui.camera.ICameraX
 import com.leandrolcd.doganalyzer.ui.model.*
@@ -31,26 +30,28 @@ class DogListViewModel@Inject constructor(
 
     lateinit var uiStatus: StateFlow<UiStatus<List<Dog>>>
 
+    lateinit var croquettes: StateFlow<Int>
+
     lateinit var navHostController: NavHostController
 
     val dogRecognition = mutableStateOf(listOf(DogRecognition("", 0f)))
 
     init {
-        dogCollection()
+        startStatus()
     }
 
-    private fun dogCollection(){
+    private fun startStatus(){
         viewModelScope.launch {
 
             uiStatus = dogUseCase().map(::Success)
                 .catch { Error(it) }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), UiStatus.Loading())
+            croquettes =
+                dogUseCase.getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
 
         }
     }
-
-
     fun recognizerImage(imageProxy: ImageProxy) {
         viewModelScope.launch {
             dogRecognition.value = classifierRepository.recognizeImage(imageProxy)
@@ -58,12 +59,10 @@ class DogListViewModel@Inject constructor(
             imageProxy.close()
         }
     }
-
-    fun logout() {
-        //loginUseCase.logout()
-        //dogUseCase.clearCache()
-        navHostController.popBackStack()
-        navHostController.navigate(Routes.ScreenLogin.route)
+    fun onUnCoverRequest(mlId: String) {
+        viewModelScope.launch {
+            dogUseCase.addDogByMlId(mlId, 0)
+        }
     }
 
 

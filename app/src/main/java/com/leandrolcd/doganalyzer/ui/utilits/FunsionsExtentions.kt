@@ -9,6 +9,8 @@ import android.net.ConnectivityManager
 import androidx.compose.ui.graphics.Color
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
 import com.leandrolcd.doganalyzer.ui.model.Dog
+import com.leandrolcd.doganalyzer.ui.utilits.COUNTER_DETAIL_PREFS
+import com.leandrolcd.doganalyzer.ui.utilits.COUNTER_RECOGNITION_REFS
 
 
 fun Color.opacity(alpha:Float): Color {
@@ -38,6 +40,7 @@ fun DogDTO.toDog(): Dog {
             heightMaleEs = this.heightMaleEs,
             heightFemaleEs = this.heightFemaleEs,
             curiositiesEs = this.curiositiesEs,
+            croquettes = onCroquettes(this.race)
         )
 
     }
@@ -64,9 +67,20 @@ fun List<DogDTO>.toDogList(): List<Dog> {
             weightFemaleEs = it.weightFemaleEs,
             heightMaleEs = it.heightMaleEs,
             heightFemaleEs = it.heightFemaleEs,
-            mlId = it.mlId
+            mlId = it.mlId,
+            croquettes = onCroquettes(it.race)
         )
 
+    }
+}
+
+fun onCroquettes(race: String): Int {
+return when(race){
+        "Small" -> { 5 }
+        "Median" -> { 9 }
+        "Big" -> { 15 }
+        "Giant" -> { 18 }
+        else -> { 0 }
     }
 }
 
@@ -85,7 +99,8 @@ fun isNetworkConnected(context: Context): Boolean {
 }
 
 fun Context.getRecognitionClick(): Int {
-    return getSharedPreferences(COUNTER_RECOGNITION_REFS, Context.MODE_PRIVATE).getInt(COUNTER_RECOGNITION_REFS, 0)
+    return getSharedPreferences(COUNTER_RECOGNITION_REFS, Context.MODE_PRIVATE).getInt(
+        COUNTER_RECOGNITION_REFS, 0)
 }
 fun Context.setRecognitionClick():Int {
     val number = this.getRecognitionClick() + 1
@@ -95,7 +110,8 @@ fun Context.setRecognitionClick():Int {
     return number
 }
 fun Context.getDetailClick(): Int {
-    return getSharedPreferences(COUNTER_DETAIL_PREFS, Context.MODE_PRIVATE).getInt(COUNTER_DETAIL_PREFS, 0)
+    return getSharedPreferences(COUNTER_DETAIL_PREFS, Context.MODE_PRIVATE).getInt(
+        COUNTER_DETAIL_PREFS, 0)
 }
 
 fun Context.setDetailClick():Int {

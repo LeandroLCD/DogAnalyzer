@@ -1,4 +1,4 @@
-package com.leandrolcd.doganalyzer
+package com.leandrolcd.doganalyzer.ui.utilits
 
 import android.content.Context
 import android.os.Build

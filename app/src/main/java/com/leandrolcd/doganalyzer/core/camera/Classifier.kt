@@ -1,7 +1,7 @@
 package com.leandrolcd.doganalyzer.core.camera
 
 import android.graphics.Bitmap
-import com.leandrolcd.doganalyzer.MAX_RECOGNITION_DOG_RESULTS
+import com.leandrolcd.doganalyzer.ui.utilits.MAX_RECOGNITION_DOG_RESULTS
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.TensorProcessor
