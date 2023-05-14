@@ -88,11 +88,7 @@ fun DogListScreen(
         is UiStatus.Error -> {
             ErrorLoginScreen(message = (uiState as UiStatus.Error<List<Dog>>).message) {
                 activity.finish()
-
             }
-        }
-        is UiStatus.Loaded -> {
-
         }
         is UiStatus.Loading -> {
             LoadingScreen()
@@ -112,6 +108,7 @@ fun DogListScreen(
                 )
             }
         }
+        else -> {}
     }
 
 }
