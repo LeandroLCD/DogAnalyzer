@@ -34,6 +34,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
+import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
 import com.leandrolcd.doganalyzer.ui.admob.removeInterstitial
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoginScreen
@@ -57,6 +58,10 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var interstitialAdMod: InterstitialAdMod
+
+    @Inject
+    lateinit var rewardAdView: RewardAdView
+
     lateinit var navigationController:NavHostController
     private val loginViewModel: LoginComposeViewModel by viewModels()
     private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
@@ -69,6 +74,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {}
         interstitialAdMod.load(this)
+        rewardAdView.load(this)
+
         remoteConfig.setConfigSettingsAsync(configSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 

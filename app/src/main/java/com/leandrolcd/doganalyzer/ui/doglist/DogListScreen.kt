@@ -5,6 +5,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -131,11 +132,12 @@ fun DogListContent(
     }
     var isBanner by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
+    var isVisibleStore by remember { mutableStateOf(false) }
     var dogSelect by remember { mutableStateOf<Dog?>(null) }
     val context = LocalContext.current
     Scaffold(
         topBar = {
-            MyTopBar(croquettes = croquettesCount) {
+            MyTopBar(croquettes = croquettesCount, onClickCroquettes = {isVisibleStore = true}) {
                 navHostController.navigate(Routes.ScreenProfile.route)
             }
 
@@ -201,6 +203,7 @@ fun DogListContent(
             CameraCompose()
 
         }
+
         StoreDialog(
             isVisible = isVisible,
             onDismissRequest = { isVisible = false },
@@ -212,6 +215,11 @@ fun DogListContent(
                 Toast.makeText(context, "Insufficient Croquettes", Toast.LENGTH_LONG).show()
             }
         }
+
+        CroquettesDialog(
+            isVisible = isVisibleStore,
+            croquettes = croquettesCount, viewModel = viewModel,
+            onDismissRequest = { isVisibleStore = false })
 
     }
 }
@@ -304,7 +312,7 @@ fun DogAnimation() {
 }
 
 @Composable
-fun MyTopBar(croquettes: Int = 0, onClick: () -> Unit) {
+fun MyTopBar(croquettes: Int = 0, onClickCroquettes: () -> Unit, onClick: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.Title)) },
         backgroundColor = primaryColor,
@@ -312,13 +320,8 @@ fun MyTopBar(croquettes: Int = 0, onClick: () -> Unit) {
         elevation = 8.dp,
         actions = {
 
-            Row {
-
-                Icon(
-                    painter = painterResource(id = R.drawable.croquette), contentDescription = "",
-                    tint = Marron, modifier = Modifier.size(20.dp)
-                )
-                Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+            CroquettesIcon(croquettes){
+                onClickCroquettes()
             }
 
             IconButton(onClick = { onClick() }) {
@@ -330,6 +333,18 @@ fun MyTopBar(croquettes: Int = 0, onClick: () -> Unit) {
         }
 
     )
+}
+
+@Composable
+fun CroquettesIcon(croquettes: Int = 0, onClickCroquettes: () -> Unit) {
+    Row(Modifier.clickable { onClickCroquettes() }) {
+
+        Icon(
+            painter = painterResource(id = R.drawable.croquette), contentDescription = "",
+            tint = Marron, modifier = Modifier.size(20.dp)
+        )
+        Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+    }
 }
 
 @Composable
@@ -387,9 +402,9 @@ fun StoreDialog(
                         formatArgs = arrayCroquettes
                     ),
                     fontSize = 16.sp, textAlign = TextAlign.Justify,
-                    color = if(isSystemInDarkTheme()) {
+                    color = if (isSystemInDarkTheme()) {
                         Color.White
-                    }else{
+                    } else {
                         Color.Black
                     }
                 )
@@ -411,4 +426,56 @@ fun StoreDialog(
 
 
     }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@Composable
+fun CroquettesDialog(
+    isVisible: Boolean,
+    croquettes: Int,
+    viewModel: DogListViewModel,
+    onDismissRequest: () -> Unit
+) {
+val context = LocalContext.current
+    if (isVisible) {
+        AlertDialog(onDismissRequest = { onDismissRequest() },
+            title = {
+                TitleDialog(text = stringResource(R.string.dog_store), Modifier)
+            },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    TextDescription(
+                        textSp = stringResource(
+                            id = R.string.dog_store_message_ES
+                        ),
+                        textEn = stringResource(
+                            R.string.dog_store_message_En
+                        ),
+                        fontSize = 16.sp, textAlign = TextAlign.Justify,
+                        color = if (isSystemInDarkTheme()) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CroquettesIcon(croquettes = croquettes){}
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.onRewardShow(context as Activity)
+                }) {
+                    Text(text = stringResource(R.string.uncover))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismissRequest() }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+
+    }
+
 }

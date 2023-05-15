@@ -1,5 +1,6 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
+import android.app.Activity
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
 import com.leandrolcd.doganalyzer.domain.IGetDogListUseCase
+import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
 import com.leandrolcd.doganalyzer.ui.camera.ICameraX
 import com.leandrolcd.doganalyzer.ui.model.*
 import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
@@ -22,7 +24,8 @@ import javax.inject.Inject
 class DogListViewModel@Inject constructor(
     cameraX: ICameraX,
     private val classifierRepository: IClassifierRepository,
-    private val dogUseCase: IGetDogListUseCase
+    private val dogUseCase: IGetDogListUseCase,
+    private val rewardAdView: RewardAdView
 ) : ViewModel() {
 
     var cameraX = mutableStateOf(cameraX)
@@ -62,6 +65,16 @@ class DogListViewModel@Inject constructor(
     fun onUnCoverRequest(mlId: String) {
         viewModelScope.launch {
             dogUseCase.addDogByMlId(mlId, 0)
+        }
+    }
+
+
+
+    fun onRewardShow(context: Activity){
+        rewardAdView.show(context) {
+                    viewModelScope.launch {
+                dogUseCase.setCroquettes(it)
+            }
         }
     }
 
