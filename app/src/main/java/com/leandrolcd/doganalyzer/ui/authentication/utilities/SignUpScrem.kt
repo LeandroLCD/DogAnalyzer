@@ -2,6 +2,7 @@ package com.leandrolcd.doganalyzer.ui.authentication.utilities
 
 import android.app.Activity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -166,7 +167,11 @@ fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
         if (!enableButton) {
             Text(
                 text = stringResource(R.string.password_requirements),
-                color = Color.Red,
+                color = if(isSystemInDarkTheme()){
+                             Color.White
+                        }else{
+                             Color.Red
+                     },
                 fontSize = 10.sp
             )
         } else {

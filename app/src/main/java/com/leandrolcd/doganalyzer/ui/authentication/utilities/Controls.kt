@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -54,7 +55,7 @@ fun MyButton(label: String, isButtonEnabled: Boolean, onClickSignUp: () -> Unit)
         contentPadding = PaddingValues(4.dp),
         colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = primaryColor,
-            contentColor = textColor,
+            contentColor = Color.White,
             disabledContentColor = backGroupTextField
         ),
         elevation = ButtonDefaults.elevation(
@@ -77,7 +78,11 @@ fun Huellas() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = floor(configuration.screenHeightDp * 0.3).toInt().dp),
-        tint = colorGray
+        tint = if(isSystemInDarkTheme()) {
+            Color.Black
+        }else{
+            colorGray
+        }
     )
 }
 

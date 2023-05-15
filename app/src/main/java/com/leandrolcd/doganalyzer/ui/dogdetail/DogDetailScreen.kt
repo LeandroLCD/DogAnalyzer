@@ -249,6 +249,11 @@ fun TitleDialog(text: String, modifier: Modifier) {
 
 @Composable
 fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
+    val color = if(isSystemInDarkTheme()) {
+        Color.White
+    }else{
+        Color.Black
+    }
     TextButton(onClick = { onSelectItems(dog) }) {
         Row(Modifier) {
             Row(
@@ -256,11 +261,14 @@ fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
                     .horizontalScroll(rememberScrollState())
                     .weight(1f)
             ) {
-                Text(text = dog.name, color = Color.Black, maxLines = 1, softWrap = true)
+                Text(text = dog.name,
+                    color = color,
+                    maxLines = 1,
+                    softWrap = true)
             }
             Text(
                 text = "${floor(dog.confidence).toInt()} %",
-                color = Color.Black,
+                color = color,
                 modifier = Modifier
                     .width(70.dp)
                     .padding(end = 8.dp),

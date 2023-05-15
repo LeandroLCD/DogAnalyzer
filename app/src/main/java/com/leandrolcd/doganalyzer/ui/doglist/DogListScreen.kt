@@ -5,6 +5,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -385,7 +386,12 @@ fun StoreDialog(
                         R.string.store_description_En,
                         formatArgs = arrayCroquettes
                     ),
-                    fontSize = 16.sp, textAlign = TextAlign.Justify
+                    fontSize = 16.sp, textAlign = TextAlign.Justify,
+                    color = if(isSystemInDarkTheme()) {
+                        Color.White
+                    }else{
+                        Color.Black
+                    }
                 )
             },
             confirmButton = {
@@ -400,7 +406,9 @@ fun StoreDialog(
                 TextButton(onClick = { onDismissRequest() }) {
                     Text(text = stringResource(R.string.cancel))
                 }
-            })
+            }
+        )
+
 
     }
 }

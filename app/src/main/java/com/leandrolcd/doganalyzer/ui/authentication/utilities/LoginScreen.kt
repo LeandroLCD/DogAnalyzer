@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -34,6 +35,7 @@ import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
+import com.leandrolcd.doganalyzer.ui.ui.theme.Purple200
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.math.floor
@@ -343,7 +345,11 @@ fun ForgotPassword(modifier: Modifier) {
         text = stringResource(R.string.forgot),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = primaryColor,
+        color = if(isSystemInDarkTheme()) {
+            Purple200
+        }else{
+            primaryColor
+        },
         modifier = modifier
     )
 }
@@ -364,7 +370,11 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
                     .padding(end = 8.dp)
                     .align(CenterVertically)
             )
-            Text(stringResource(R.string.continue_with_login))
+            Text(stringResource(R.string.continue_with_login), color = if(isSystemInDarkTheme()) {
+                Color.White
+            }else{
+                Color.Black
+            })
             MyDivider(
                 Modifier
                     .weight(1f)
@@ -393,7 +403,11 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
 @Composable
 fun MyDivider(modifier: Modifier = Modifier) {
     Divider(
-        color = Color.Gray,
+        color = if(isSystemInDarkTheme()) {
+            Color.White
+        }else{
+            Color.Gray
+        },
         thickness = 1.dp,
         modifier = modifier
             .padding(vertical = 4.dp)
@@ -419,7 +433,11 @@ fun SignUp(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Bottom
     ) {
-        Text(stringResource(R.string.dont_have_an_account), fontSize = 12.sp, color = Color.Black)
+        Text(stringResource(R.string.dont_have_an_account), fontSize = 12.sp, color = if(isSystemInDarkTheme()) {
+            Color.White
+        }else{
+            Color.Black
+        })
         Text(
             stringResource(R.string.sign_up),
             Modifier
@@ -427,7 +445,11 @@ fun SignUp(
                 .clickable { onSignUpClicked() },
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryColor
+            color  = if(isSystemInDarkTheme()) {
+                Purple200
+            }else{
+                primaryColor
+            }
         )
 
     }
