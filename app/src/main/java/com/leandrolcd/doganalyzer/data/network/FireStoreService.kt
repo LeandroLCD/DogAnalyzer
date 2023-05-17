@@ -50,7 +50,9 @@ class FireStoreService @Inject constructor(
         return dogList
     }
 
-    suspend fun deleteUser(uid: String) {
+    suspend fun deleteDataUser(uid: String):Boolean {
+        try {
+
         val db = fireStore
         val batch = db.batch()
 
@@ -73,6 +75,10 @@ class FireStoreService @Inject constructor(
 
         // Ejecutar las operaciones en lote
         batch.commit().await()
+            return true
+        }catch (e:Exception){
+            return false
+        }
     }
 
 

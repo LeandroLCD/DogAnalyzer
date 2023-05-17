@@ -135,7 +135,7 @@ class FireStoreRepository @Inject constructor(
     override suspend fun synchronizeNow(uid: String) {
 
         withContext(dispatcher) {
-            fireStore.deleteUser(uid)
+          val deferred = async {  fireStore.deleteDataUser(uid) }
             val list = fireStore.getDogListUser()
             if (dogIdUser.isNotEmpty()) {
                 dogIdUser.map {
@@ -147,7 +147,11 @@ class FireStoreRepository @Inject constructor(
                 }
 
             }
-            dogIdUser.addAll(list)
+            val delete = deferred.await()
+            if(delete){
+                dogIdUser.addAll(list)
+            }
+
         }
 
     }
