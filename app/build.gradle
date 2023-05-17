@@ -16,15 +16,15 @@ plugins {
 }
 
 android {
-    namespace 'com.leandrolcd.dogedexmvvm'
+    namespace 'com.leandrolcd.doganalyzer'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.leandrolcd.dogedexmvvm"
-        minSdk 24
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        applicationId "com.leandrolcd.doganalyzer"
+        minSdk 21
+        targetSdk 31
+        versionCode 3
+        versionName "1.2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -83,39 +83,41 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
 
-
+    //region Google Ads
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
+    //endregion
 
     // dowload image
     implementation "io.coil-kt:coil:2.3.0"
     implementation "io.coil-kt:coil-gif:2.2.2"
 
     //libreria de iconos
-    implementation 'androidx.compose.material:material:1.4.2'
-    implementation "androidx.compose.material:material-icons-extended:1.4.2"
+    implementation 'androidx.compose.material:material:1.4.3'
+    implementation "androidx.compose.material:material-icons-extended:1.4.3"
 
     //async and viewModel
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
 
+    //region dataStore
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
+    //endregion
     //region Animation
     implementation "com.airbnb.android:lottie-compose:4.0.0"
-    //endregion
-
-    //region retrofit
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     //endregion
 
     //region CameraX
     implementation "androidx.camera:camera-lifecycle:$cameraxVersion"
     implementation "androidx.camera:camera-view:$cameraxVersion"
     implementation "androidx.camera:camera-extensions:1.3.0-alpha05"
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 
     //endregion
 
@@ -163,9 +165,12 @@ dependencies {
     //region Firebase
     implementation platform('com.google.firebase:firebase-bom:31.3.0')
     implementation 'com.google.firebase:firebase-firestore-ktx'
-    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation('com.google.firebase:firebase-auth-ktx') {
+        exclude module: "play-services-safetynet"
+    }
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.firebase:firebase-config-ktx'
     //endregion
 
     //region Dependency Injection 'dagger hilt' Implementations
@@ -176,6 +181,8 @@ dependencies {
 
     implementation 'androidx.activity:activity-ktx:1.7.1'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0'
+    testImplementation "io.mockk:mockk:1.11.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
