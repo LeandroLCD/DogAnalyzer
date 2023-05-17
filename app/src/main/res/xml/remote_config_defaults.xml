@@ -6,6 +6,10 @@
     </entry>
     <entry>
         <key>url_play_store</key>
-        <value></value>
+        <value>https://play.google.com/store/apps/details?id=com.leandrolcd.doganalyzer</value>
+    </entry>
+    <entry>
+        <key>max_ads_reward</key>
+        <value>3</value>
     </entry>
 </defaultsMap>

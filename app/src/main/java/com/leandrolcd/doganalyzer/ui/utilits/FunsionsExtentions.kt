@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.leandrolcd.doganalyzer
+package com.leandrolcd.doganalyzer.ui.utilits
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,8 +9,7 @@ import android.net.ConnectivityManager
 import androidx.compose.ui.graphics.Color
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
 import com.leandrolcd.doganalyzer.ui.model.Dog
-import com.leandrolcd.doganalyzer.ui.utilits.COUNTER_DETAIL_PREFS
-import com.leandrolcd.doganalyzer.ui.utilits.COUNTER_RECOGNITION_REFS
+import java.util.*
 
 
 fun Color.opacity(alpha:Float): Color {
@@ -121,3 +120,33 @@ fun Context.setDetailClick():Int {
     }
     return number
 }
+
+fun Context.getAdRewardClick(): Int {
+    return getSharedPreferences(COUNTER_AD_REWARD, Context.MODE_PRIVATE).getInt(
+        COUNTER_AD_REWARD, 0)
+}
+
+fun Context.setAdRewardClick(click:Int):Int {
+    val number = this.getAdRewardClick() + click
+    getSharedPreferences(COUNTER_AD_REWARD, Context.MODE_PRIVATE).also {
+        it.edit().putInt(COUNTER_AD_REWARD, number).apply()
+    }
+    return number
+}
+
+fun Context.getDateAdReward(): Int {
+    return getSharedPreferences(DATE_AD_REWARD, Context.MODE_PRIVATE).getInt(
+        DATE_AD_REWARD, 0)
+}
+
+fun Context.setDateAdReward(toDay:Int) {
+    getSharedPreferences(DATE_AD_REWARD, Context.MODE_PRIVATE).also {
+        it.edit().putInt(DATE_AD_REWARD, toDay).apply()
+    }
+}
+
+fun Calendar.toDay():Int = this.get(Calendar.DAY_OF_YEAR)
+
+
+
+

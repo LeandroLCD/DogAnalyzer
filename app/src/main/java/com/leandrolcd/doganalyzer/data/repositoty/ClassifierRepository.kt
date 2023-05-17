@@ -2,7 +2,7 @@ package com.leandrolcd.doganalyzer.data.repositoty
 
 import androidx.camera.core.ImageProxy
 import com.leandrolcd.doganalyzer.core.camera.Classifier
-import com.leandrolcd.doganalyzer.rotate
+import com.leandrolcd.doganalyzer.ui.utilits.rotate
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

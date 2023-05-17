@@ -11,6 +11,8 @@ const val MODEL_PATH = "model.tflite"
 const val LABEL_PATH = "labels.txt"
 const val COUNTER_DETAIL_PREFS = "detail_click"
 const val COUNTER_RECOGNITION_REFS = "recognition_click"
+const val COUNTER_AD_REWARD = "adreward"
+const val DATE_AD_REWARD = "dateadreward"
 const val IS_DEBUG = false
 
 

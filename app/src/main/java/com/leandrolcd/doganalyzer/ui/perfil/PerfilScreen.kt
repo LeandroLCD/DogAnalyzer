@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -44,9 +47,20 @@ fun ProfileScreen(navController: NavHostController, viewModel: ProfileViewModel 
             .background(Color.Gray)
             .fillMaxSize()
     ) {
-        val (header, body) = createRefs()
+        val (header, body, backButton) = createRefs()
         val topGuide = createGuidelineFromTop(0.35f)
 
+        IconButton(onClick = { navController.popBackStack() },
+                    modifier = Modifier.constrainAs(backButton){
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIos,
+                contentDescription = stringResource(R.string.back),
+                tint = primaryColor
+            )
+        }
 
         Box(modifier = Modifier
             .background(Color.Transparent)
@@ -97,7 +111,7 @@ fun ProfileAnimation() {
 @ExperimentalTextApi
 @Composable
 fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostController) {
-    val user =viewModel.userCurrent
+    val user = viewModel.userCurrent
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     val dogCount by produceState(
@@ -142,50 +156,65 @@ fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostContro
                     Modifier.padding(horizontal = 8.dp)
                 )
             }
-            Row(Modifier.fillMaxWidth().padding(30.dp),
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(30.dp),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 TextTitle(
                     textSp = stringResource(R.string.croquettes_Es),
                     textEn = stringResource(R.string.croquettes_En), color = Color.Black,
                     fontSize = 30.sp,
 
-                )
+                    )
                 Icon(
                     painter = painterResource(id = R.drawable.croquette),
                     contentDescription = stringResource(id = R.string.croquettes_En),
                     modifier = Modifier.size(50.dp), tint = Marron
                 )
 
-                TextDescription(textSp = croquettesCount.toString(),
+                TextDescription(
+                    textSp = croquettesCount.toString(),
                     textEn = croquettesCount.toString(),
                     Modifier.padding(horizontal = 8.dp),
                     color = Color.Black,
-                    fontSize = 30.sp,)
+                    fontSize = 30.sp,
+                )
             }
 
-            val value = Values(min = 0f, max=120f, dogCount.toFloat(), unit = "Dod")
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                SemiCircularGauge(values = value,
+            val value = Values(
+                min = 0f,
+                max = 120f,
+                dogCount.toFloat(),
+                unit = stringResource(id = R.string.dog)
+            )
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                SemiCircularGauge(
+                    values = value,
                     indicatorColor = primaryColor,
                     strokeIndicator = 40f,
-                    modifier = Modifier.size(200.dp))
+                    modifier = Modifier.size(200.dp)
+                )
             }
-            Box(modifier = Modifier, contentAlignment = Alignment.BottomCenter){
+            Box(modifier = Modifier, contentAlignment = Alignment.BottomCenter) {
                 if (user?.isAnonymous == true) {
 
-                    MyButton(label = stringResource(id = R.string.link_account_En), isButtonEnabled = true ){
-                       // navController.popBackStack()
+                    MyButton(
+                        label = stringResource(id = R.string.link_account_En),
+                        isButtonEnabled = true
+                    ) {
+                        // navController.popBackStack()
                         navController.navigate(Routes.ScreenLogin.route)
                     }
 
                 } else {
-                    MyButton(label = stringResource(id = R.string.logout), isButtonEnabled = true ){
+                    MyButton(label = stringResource(id = R.string.logout), isButtonEnabled = true) {
                         //dialog
-                            viewModel.logout()
-                            navController.popBackStack()
-                            navController.navigate(Routes.ScreenLoading.route)
-
+                        viewModel.logout()
+                        navController.popBackStack()
+                        navController.navigate(Routes.ScreenLoading.route)
 
                     }
 

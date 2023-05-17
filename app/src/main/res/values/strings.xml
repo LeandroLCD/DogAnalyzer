@@ -32,8 +32,8 @@
     <string name="banner_id_debug">ca-app-pub-3940256099942544/6300978111</string>
     <string name="interstitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
     <string name="interstitial_release">ca-app-pub-2089536578261112/3034114376</string>
-    <string name="update_require_es">Para continuar es necesario instalar la última actualización</string>
-    <string name="update_require_en">To continue it is required to install the latest update</string>
+    <string name="update_require_es">Para continuar utilizando el Dog Analizer, es necesario instalar la última actualización.</string>
+    <string name="update_require_en">To continue it is required to install the latest update.</string>
     <string name="update">Update</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="account_Es">Cuenta:</string>
@@ -47,5 +47,9 @@
     <string name="uncover">Unlock</string>
     <string name="store_description_Es">Para despertar este perrito necesitas %1$d croquetas, tus croquetas acumuladas son %2$d.</string>
     <string name="store_description_En">To wake up this puppy you need %1$d croquettes, your accumulated croquettes are %2$d.</string>
+    <string name="dog_store_message_ES">¡Bienvenido a Dog Store, el lugar ideal para encontrar croquetas que harán que los perros se despierten con entusiasmo! Puedes obtener estas deliciosas croquetas viendo anuncios o escaneando perros.</string>
+    <string name="dog_store_message_En">Welcome to the Dog Store, the place to be for kibble that will get your dogs excited! You can get these delicious kibbles by watching ads or by scanning dogs.</string>
+    <string name="reward_id">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="reward_id_release">ca-app-pub-2089536578261112/2486650587</string>
 
 </resources>

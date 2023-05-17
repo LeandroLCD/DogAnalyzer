@@ -11,9 +11,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,14 +34,18 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
 import com.airbnb.lottie.compose.*
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.leandrolcd.doganalyzer.BuildConfig
-import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.isSpanish
+import com.leandrolcd.doganalyzer.ui.MainActivity.Companion.MAXADSREWARD
 import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
+import com.leandrolcd.doganalyzer.ui.dogdetail.TitleDialog
+import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.ui.theme.*
+import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
+import com.leandrolcd.doganalyzer.ui.utilits.isSpanish
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlin.math.floor
@@ -258,6 +262,9 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 
 }
 
+@ExperimentalCoilApi
+@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("ResourceType")
 @ExperimentalCoroutinesApi
 @Composable
@@ -278,11 +285,13 @@ fun StartScreen(
             if (task.isSuccessful) {
                 val versionMinima = remoteConfig.getString("version_minima")
                 urlPlayStore = remoteConfig.getString("url_play_store")
+                MAXADSREWARD = remoteConfig.getLong("max_ads_reward").toInt()
                 val compare = versionMinima.compareTo(BuildConfig.VERSION_NAME)
                 if (compare > 0) {
                     val defaults = hashMapOf<String, Any>(
                         "version_minima" to versionMinima,
-                        "url_play_store" to urlPlayStore
+                        "url_play_store" to urlPlayStore,
+                        "max_ads_reward" to MAXADSREWARD
                     )
                     val inputStream =
                         context.resources.openRawResource(R.xml.remote_config_defaults)
@@ -324,24 +333,7 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
     if (isVisible) {
         AlertDialog(onDismissRequest = {},
             title = {
-                Row(
-                    modifier = Modifier.padding(bottom = 24.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Pets,
-                        contentDescription = stringResource(id = R.string.dog_image),
-                        tint = Purple200,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Purple200
-                    )
-                }
+                TitleDialog(text = stringResource(R.string.app_name))
             },
             text = {
                 Text(
@@ -357,8 +349,8 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
                 )
             },
             confirmButton = {
-                TextButton(onClick = { onUpdateClicked() }) {
-                    Text(text = stringResource(R.string.update))
+                ButtonDialog(text = stringResource(R.string.update)) {
+                    onUpdateClicked()
                 }
             }
         )

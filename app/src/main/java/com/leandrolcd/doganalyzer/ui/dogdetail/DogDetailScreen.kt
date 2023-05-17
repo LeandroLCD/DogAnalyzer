@@ -39,14 +39,12 @@ import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
+import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
-import com.leandrolcd.doganalyzer.ui.ui.theme.Purple200
-import com.leandrolcd.doganalyzer.ui.ui.theme.colorGray
-import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
-import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
-import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
+import com.leandrolcd.doganalyzer.ui.ui.theme.*
+import com.leandrolcd.doganalyzer.ui.utilits.*
 import kotlin.math.floor
 
 @ExperimentalCoilApi
@@ -206,7 +204,7 @@ fun DogDialog(
     if (isVisible) {
         AlertDialog(onDismissRequest = { onDismissRequest() },
             title = {
-                TitleDialog(text = stringResource(R.string.top_score), Modifier.padding(bottom = 24.dp))
+                TitleDialog(text = stringResource(R.string.top_score))
             },
             text = {
                 LazyColumn(content = {
@@ -216,8 +214,8 @@ fun DogDialog(
                 })
             },
             confirmButton = {
-                TextButton(onClick = { onDismissRequest() }) {
-                    Text(text = stringResource(R.string.cancel))
+                ButtonDialog(text = stringResource(id = R.string.cancel)) {
+                    onDismissRequest()
                 }
             }
         )
@@ -226,15 +224,17 @@ fun DogDialog(
 }
 
 @Composable
-fun TitleDialog(text: String, modifier: Modifier) {
+fun TitleDialog(text: String) {
+
+    val color = Purple500
     Row(
-        modifier = modifier,
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Outlined.Pets,
             contentDescription = stringResource(id = R.string.dog_image),
-            tint = Purple200,
+            tint = color,
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(10.dp))
@@ -242,7 +242,7 @@ fun TitleDialog(text: String, modifier: Modifier) {
             text = text,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Purple200
+            color = color
         )
     }
 }
@@ -493,14 +493,14 @@ fun DogCuriosities(textEn: String, textSp: String, modifier: Modifier = Modifier
             if (scroll.value < (scroll.maxValue - 10)) {
                 Icon(
                     imageVector = Icons.Outlined.ExpandMore,
-                    contentDescription = "",
+                    contentDescription = "Scroll",
                     modifier = Modifier.size(30.dp),
                     tint = Color.Gray
                 )
             } else {
                 Icon(
                     imageVector = Icons.Outlined.ExpandLess,
-                    contentDescription = "",
+                    contentDescription = "Scroll",
                     modifier = Modifier.size(30.dp),
                     tint = Color.Gray
                 )
