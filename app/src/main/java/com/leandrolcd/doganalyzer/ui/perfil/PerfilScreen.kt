@@ -188,7 +188,7 @@ fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostContro
                 min = 0f,
                 max = 120f,
                 dogCount.toFloat(),
-                unit = stringResource(id = R.string.dog)
+                unit = stringResource(id = R.string.dogs)
             )
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 SemiCircularGauge(

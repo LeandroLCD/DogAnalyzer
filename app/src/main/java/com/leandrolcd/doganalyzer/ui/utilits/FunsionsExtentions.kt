@@ -75,11 +75,11 @@ fun List<DogDTO>.toDogList(): List<Dog> {
 
 fun onCroquettes(race: String): Int {
 return when(race){
-        "Small" -> { 5 }
-        "Median" -> { 9 }
-        "Big" -> { 15 }
-        "Giant" -> { 18 }
-        else -> { 0 }
+        "Small" -> { 24 }
+        "Median" -> { 48 }
+        "Big" -> { 72 }
+        "Giant" -> { 98 }
+        else -> { 100 }
     }
 }
 
