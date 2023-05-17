@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.leandrolcd.doganalyzer.ui.doglist
 
 import android.app.Activity
@@ -27,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,9 +37,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.R
+import com.leandrolcd.doganalyzer.ui.MainActivity.Companion.MAXADSREWARD
 import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
 import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
@@ -49,11 +54,13 @@ import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
 import com.leandrolcd.doganalyzer.ui.ui.theme.Marron
+import com.leandrolcd.doganalyzer.ui.ui.theme.Purple500
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
 import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
+@ExperimentalCoilApi
 @ExperimentalCoroutinesApi
 @RequiresApi(Build.VERSION_CODES.R)
 @ExperimentalMaterial3Api
@@ -115,6 +122,7 @@ fun DogListScreen(
 
 }
 
+@ExperimentalCoilApi
 @ExperimentalCoroutinesApi
 @RequiresApi(Build.VERSION_CODES.R)
 @ExperimentalMaterial3Api
@@ -137,7 +145,7 @@ fun DogListContent(
     val context = LocalContext.current
     Scaffold(
         topBar = {
-            MyTopBar(croquettes = croquettesCount, onClickCroquettes = {isVisibleStore = true}) {
+            MyTopBar(croquettes = croquettesCount, onClickCroquettes = { isVisibleStore = true }) {
                 navHostController.navigate(Routes.ScreenProfile.route)
             }
 
@@ -205,7 +213,7 @@ fun DogListContent(
         }
 
         StoreDialog(
-            isVisible = isVisible,
+            isVisible = isVisible, viewModel = viewModel,
             onDismissRequest = { isVisible = false },
             arrayCroquettes = arrayOf(dogSelect?.croquettes ?: 0, croquettesCount)
         ) {
@@ -218,7 +226,7 @@ fun DogListContent(
 
         CroquettesDialog(
             isVisible = isVisibleStore,
-            croquettes = croquettesCount, viewModel = viewModel,
+            viewModel = viewModel,
             onDismissRequest = { isVisibleStore = false })
 
     }
@@ -264,7 +272,7 @@ fun ItemDog(dog: Dog, onItemSelected: (Dog) -> Unit, onUnCoverRequest: (Dog) -> 
             shape = RoundedCornerShape(16.dp),
             elevation = 8.dp
         ) {
-            SubcomposeAsyncImage(contentDescription = stringResource(R.string.dog_image),
+            SubcomposeAsyncImage(contentDescription = "${dog.name} image",
                 modifier = Modifier.background(Color.White),
                 model = dog.imageUrl,
                 loading = {
@@ -290,14 +298,14 @@ fun ItemDog(dog: Dog, onItemSelected: (Dog) -> Unit, onUnCoverRequest: (Dog) -> 
         ) {
 
             Text(text = "${dog.index}", Modifier.padding(horizontal = 8.dp))
-            DogAnimation()
+            DogAnimation(R.raw.error_dog)
 
         }
     }
 
 @Composable
-fun DogAnimation() {
-    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.error_dog))
+fun DogAnimation(rawRes: Int, modifier: Modifier = Modifier) {
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(rawRes))
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = LottieConstants.IterateForever,
@@ -307,7 +315,7 @@ fun DogAnimation() {
     LottieAnimation(
         composition = composition,
         progress = progress,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     )
 }
 
@@ -320,7 +328,7 @@ fun MyTopBar(croquettes: Int = 0, onClickCroquettes: () -> Unit, onClick: () -> 
         elevation = 8.dp,
         actions = {
 
-            CroquettesIcon(croquettes){
+            CroquettesIcon(croquettes) {
                 onClickCroquettes()
             }
 
@@ -331,19 +339,20 @@ fun MyTopBar(croquettes: Int = 0, onClickCroquettes: () -> Unit, onClick: () -> 
                 )
             }
         }
-
     )
 }
 
 @Composable
 fun CroquettesIcon(croquettes: Int = 0, onClickCroquettes: () -> Unit) {
-    Row(Modifier.clickable { onClickCroquettes() }) {
 
-        Icon(
-            painter = painterResource(id = R.drawable.croquette), contentDescription = "",
-            tint = Marron, modifier = Modifier.size(20.dp)
-        )
-        Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+    IconButton(onClick = { onClickCroquettes() }) {
+        Row {
+            Icon(
+                painter = painterResource(id = R.drawable.croquette), contentDescription = "",
+                tint = Marron, modifier = Modifier.size(20.dp)
+            )
+            Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
+    }
     }
 }
 
@@ -378,69 +387,96 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
     }
 }
 
+
+@ExperimentalCoilApi
+@ExperimentalMaterial3Api
+@ExperimentalCoroutinesApi
 @Composable
 fun StoreDialog(
     isVisible: Boolean,
+    viewModel: DogListViewModel,
     arrayCroquettes: Array<Int>,
     onDismissRequest: () -> Unit,
     onUnCoverRequest: () -> Unit
 ) {
+    val context = LocalContext.current
 
     if (isVisible) {
         AlertDialog(onDismissRequest = { onDismissRequest() },
             title = {
-                TitleDialog(text = stringResource(R.string.dog_store), Modifier)
+                TitleDialog(text = stringResource(R.string.dog_store))
             },
             text = {
-                TextDescription(
-                    textSp = stringResource(
-                        id = R.string.store_description_Es,
-                        formatArgs = arrayCroquettes
-                    ),
-                    textEn = stringResource(
-                        R.string.store_description_En,
-                        formatArgs = arrayCroquettes
-                    ),
-                    fontSize = 16.sp, textAlign = TextAlign.Justify,
-                    color = if (isSystemInDarkTheme()) {
-                        Color.White
-                    } else {
-                        Color.Black
+                Box{
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        TextDescription(
+                            textSp = stringResource(
+                                id = R.string.store_description_Es,
+                                formatArgs = arrayCroquettes
+                            ),
+                            textEn = stringResource(
+                                R.string.store_description_En,
+                                formatArgs = arrayCroquettes
+                            ),
+                            fontSize = 16.sp, textAlign = TextAlign.Justify,
+                            color = if (isSystemInDarkTheme()) {
+                                Color.White
+                            } else {
+                                Color.Black
+                            }
+                        )
+                        if (viewModel.counterAdReward <= MAXADSREWARD) {
+                            PlayAdReward {
+                                viewModel.onRewardShow(context as Activity)
+                            }
+                        }
                     }
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onUnCoverRequest()
-                    onDismissRequest()
-                }) {
-                    Text(text = stringResource(R.string.uncover))
+
                 }
             },
+            confirmButton = {
+                ButtonDialog(
+                    text = stringResource(R.string.uncover)
+                ) {
+                    onUnCoverRequest()
+                    onDismissRequest()
+                }
+
+            },
             dismissButton = {
-                TextButton(onClick = { onDismissRequest() }) {
-                    Text(text = stringResource(R.string.cancel))
+                ButtonDialog(text = stringResource(R.string.cancel)) {
+                    onDismissRequest()
                 }
             }
         )
-
-
     }
 }
 
+@Composable
+fun ButtonDialog(text: String, onClick: () -> Unit) {
+    val color = Purple500
+    TextButton(onClick = {
+        onClick()
+    }, colors = ButtonDefaults.textButtonColors(contentColor = color)) {
+        Text(text = text, fontWeight = FontWeight.ExtraBold)
+    }
+}
+
+@ExperimentalCoilApi
+@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun CroquettesDialog(
     isVisible: Boolean,
-    croquettes: Int,
     viewModel: DogListViewModel,
     onDismissRequest: () -> Unit
 ) {
-val context = LocalContext.current
+    val context = LocalContext.current
     if (isVisible) {
         AlertDialog(onDismissRequest = { onDismissRequest() },
             title = {
-                TitleDialog(text = stringResource(R.string.dog_store), Modifier)
+                TitleDialog(text = stringResource(R.string.dog_store))
             },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -459,23 +495,33 @@ val context = LocalContext.current
                         }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    CroquettesIcon(croquettes = croquettes){}
+                    if (viewModel.counterAdReward <= MAXADSREWARD) {
+                        PlayAdReward {
+                            viewModel.onRewardShow(context as Activity)
+                        }
+                    }
+
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onRewardShow(context as Activity)
-                }) {
-                    Text(text = stringResource(R.string.uncover))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismissRequest() }) {
-                    Text(text = stringResource(R.string.cancel))
+                    onDismissRequest()
+                }, colors = ButtonDefaults.textButtonColors(contentColor = Purple500)) {
+                    Text(text = stringResource(R.string.cancel), fontWeight = FontWeight.Bold)
                 }
             }
         )
 
     }
 
+}
+
+@Composable
+fun PlayAdReward(onRewardRequest: () -> Unit) {
+    Box(
+        Modifier
+            .size(120.dp, 100.dp), contentAlignment = Alignment.Center
+    ) {
+        DogAnimation(rawRes = R.raw.play_ads, Modifier.clickable { onRewardRequest() })
+    }
 }

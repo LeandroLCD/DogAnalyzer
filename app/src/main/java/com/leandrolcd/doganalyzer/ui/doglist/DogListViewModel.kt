@@ -1,8 +1,11 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
 import android.app.Activity
+import android.content.Context
 import androidx.camera.core.ImageProxy
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -12,10 +15,12 @@ import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
 import com.leandrolcd.doganalyzer.ui.camera.ICameraX
 import com.leandrolcd.doganalyzer.ui.model.*
 import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
+import com.leandrolcd.doganalyzer.ui.utilits.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -25,7 +30,8 @@ class DogListViewModel@Inject constructor(
     cameraX: ICameraX,
     private val classifierRepository: IClassifierRepository,
     private val dogUseCase: IGetDogListUseCase,
-    private val rewardAdView: RewardAdView
+    private val rewardAdView: RewardAdView,
+    private val contextApp: Context
 ) : ViewModel() {
 
     var cameraX = mutableStateOf(cameraX)
@@ -39,8 +45,24 @@ class DogListViewModel@Inject constructor(
 
     val dogRecognition = mutableStateOf(listOf(DogRecognition("", 0f)))
 
+    var counterAdReward by mutableStateOf(0)
+        private set
+
     init {
         startStatus()
+        onCheckedReward()
+    }
+
+    private fun onCheckedReward() {
+        val cReward = contextApp.getAdRewardClick()
+        val dateReward = contextApp.getDateAdReward()
+        val calendar = Calendar.getInstance()
+        val date = calendar.toDay()
+        if(date != dateReward){
+            contextApp.setAdRewardClick(-cReward)
+            contextApp.setDateAdReward(date)
+        }
+        counterAdReward = contextApp.getAdRewardClick()
     }
 
     private fun startStatus(){
@@ -68,12 +90,12 @@ class DogListViewModel@Inject constructor(
         }
     }
 
-
-
     fun onRewardShow(context: Activity){
         rewardAdView.show(context) {
                     viewModelScope.launch {
                 dogUseCase.setCroquettes(it)
+                        context.setAdRewardClick(1)
+                        counterAdReward = contextApp.getAdRewardClick()
             }
         }
     }

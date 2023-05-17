@@ -1,7 +1,6 @@
 package com.leandrolcd.doganalyzer.ui.admob
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -11,9 +10,6 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.utilits.IS_DEBUG
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RewardAdView @Inject constructor() {
@@ -61,7 +57,7 @@ class RewardAdView @Inject constructor() {
         rewardedAd?.show(context){ rewardItem ->
             rewardedAd = null
             load(context)
-            if (rewardItem.type == "Croquettes" && rewardItem.amount > 0){
+            if (rewardItem.amount > 0){
                     onReward(rewardItem.amount)
 
             }

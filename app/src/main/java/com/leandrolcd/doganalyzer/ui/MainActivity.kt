@@ -56,6 +56,11 @@ import javax.inject.Inject
 @ExperimentalMaterialApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    companion object{
+       var MAXADSREWARD = 0
+    }
+
     @Inject
     lateinit var interstitialAdMod: InterstitialAdMod
 

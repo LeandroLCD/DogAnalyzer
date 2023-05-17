@@ -4,7 +4,6 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -80,7 +79,9 @@ fun CameraCompose(
 @Composable
 fun ButtonCamera(enabled: Boolean = true, onCaptureClick: () -> Unit) {
     FloatingActionButton(
-        onClick = { },
+        onClick = { if(enabled){
+            onCaptureClick()
+        } },
         backgroundColor = Color.Transparent,
         modifier = Modifier.background(
             Color.Transparent
@@ -91,7 +92,6 @@ fun ButtonCamera(enabled: Boolean = true, onCaptureClick: () -> Unit) {
                 contentDescription = "Capture dog",
                 tint = primaryColor,
                 modifier = Modifier
-                    .clickable { onCaptureClick() }
                     .width(60.dp)
                     .height(60.dp))
         } else {

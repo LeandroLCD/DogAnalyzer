@@ -6,10 +6,10 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import com.leandrolcd.doganalyzer.core.makeNetworkCall
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
 import com.leandrolcd.doganalyzer.data.network.FireStoreService
-import com.leandrolcd.doganalyzer.isNetworkConnected
+import com.leandrolcd.doganalyzer.ui.utilits.isNetworkConnected
 import com.leandrolcd.doganalyzer.ui.utilits.preferencesDataStore
-import com.leandrolcd.doganalyzer.toDog
-import com.leandrolcd.doganalyzer.toDogList
+import com.leandrolcd.doganalyzer.ui.utilits.toDog
+import com.leandrolcd.doganalyzer.ui.utilits.toDogList
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
@@ -135,7 +135,7 @@ class FireStoreRepository @Inject constructor(
     override suspend fun synchronizeNow(uid: String) {
 
         withContext(dispatcher) {
-            async { fireStore.deleteUser(uid) }
+            fireStore.deleteUser(uid)
             val list = fireStore.getDogListUser()
             if (dogIdUser.isNotEmpty()) {
                 dogIdUser.map {
