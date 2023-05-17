@@ -142,6 +142,8 @@ fun DogListContent(
     var isVisible by remember { mutableStateOf(false) }
     var isVisibleStore by remember { mutableStateOf(false) }
     var dogSelect by remember { mutableStateOf<Dog?>(null) }
+
+
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -429,6 +431,8 @@ fun StoreDialog(
                             PlayAdReward {
                                 viewModel.onRewardShow(context as Activity)
                             }
+                        }else{
+                            DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
                         }
                     }
 
@@ -499,6 +503,8 @@ fun CroquettesDialog(
                         PlayAdReward {
                             viewModel.onRewardShow(context as Activity)
                         }
+                    }else{
+                        DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
                     }
 
                 }
