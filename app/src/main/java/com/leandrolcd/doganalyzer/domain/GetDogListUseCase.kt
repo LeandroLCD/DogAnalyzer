@@ -22,8 +22,8 @@ class GetDogListUseCase @Inject constructor(
     override suspend operator fun invoke(): Flow<List<Dog>> = flow {
         while(true) {
             val dogs = repository.getDogCollection()
+            delay(2000L)
             emit(dogs)
-            delay(5000)
         }
     }
 

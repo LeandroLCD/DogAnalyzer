@@ -6,6 +6,7 @@ import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -17,6 +18,7 @@ import com.leandrolcd.doganalyzer.ui.model.*
 import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
 import com.leandrolcd.doganalyzer.ui.utilits.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,7 +33,8 @@ class DogListViewModel@Inject constructor(
     private val classifierRepository: IClassifierRepository,
     private val dogUseCase: IGetDogListUseCase,
     private val rewardAdView: RewardAdView,
-    private val contextApp: Context
+    private val contextApp: Context,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     var cameraX = mutableStateOf(cameraX)
@@ -39,13 +42,15 @@ class DogListViewModel@Inject constructor(
 
     lateinit var uiStatus: StateFlow<UiStatus<List<Dog>>>
 
-    lateinit var croquettes: StateFlow<Int>
+
 
     lateinit var navHostController: NavHostController
 
     val dogRecognition = mutableStateOf(listOf(DogRecognition("", 0f)))
 
     var counterAdReward by mutableStateOf(0)
+        private set
+    var croquettes by mutableStateOf(0)
         private set
 
     init {
@@ -66,13 +71,15 @@ class DogListViewModel@Inject constructor(
     }
 
     private fun startStatus(){
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
 
             uiStatus = dogUseCase().map(::Success)
                 .catch { Error(it) }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), UiStatus.Loading())
-            croquettes =
-                dogUseCase.getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+              dogUseCase.getCroquettes().collect{
+                  croquettes = it
+            }
+
 
 
         }

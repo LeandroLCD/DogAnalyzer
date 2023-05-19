@@ -125,7 +125,13 @@ fun Context.getAdRewardClick(): Int {
     return getSharedPreferences(COUNTER_AD_REWARD, Context.MODE_PRIVATE).getInt(
         COUNTER_AD_REWARD, 0)
 }
-
+fun Context.setZeroAdRewardClick():Int {
+    val number:Int = this.getAdRewardClick()
+    getSharedPreferences(COUNTER_AD_REWARD, Context.MODE_PRIVATE).also {
+        it.edit().putInt(COUNTER_AD_REWARD, -number).apply()
+    }
+    return number
+}
 fun Context.setAdRewardClick(click:Int):Int {
     val number = this.getAdRewardClick() + click
     getSharedPreferences(COUNTER_AD_REWARD, Context.MODE_PRIVATE).also {

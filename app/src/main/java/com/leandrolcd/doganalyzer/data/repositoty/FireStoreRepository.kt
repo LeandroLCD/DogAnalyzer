@@ -1,23 +1,22 @@
 package com.leandrolcd.doganalyzer.data.repositoty
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import com.leandrolcd.doganalyzer.core.makeNetworkCall
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
 import com.leandrolcd.doganalyzer.data.network.FireStoreService
-import com.leandrolcd.doganalyzer.ui.utilits.isNetworkConnected
-import com.leandrolcd.doganalyzer.ui.utilits.preferencesDataStore
-import com.leandrolcd.doganalyzer.ui.utilits.toDog
-import com.leandrolcd.doganalyzer.ui.utilits.toDogList
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
+import com.leandrolcd.doganalyzer.ui.utilits.isNetworkConnected
+import com.leandrolcd.doganalyzer.ui.utilits.setAdRewardClick
+import com.leandrolcd.doganalyzer.ui.utilits.setZeroAdRewardClick
+import com.leandrolcd.doganalyzer.ui.utilits.toDog
+import com.leandrolcd.doganalyzer.ui.utilits.toDogList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.floor
@@ -30,7 +29,7 @@ interface IFireStoreRepository {
 
     suspend fun getCroquettes(): Flow<Int>
 
-    suspend fun setCroquettes(croquettes: Int)
+    suspend fun setCroquettes(croquettes: Int):Boolean
     suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>>
     suspend fun synchronizeNow(uid: String)
 }
@@ -45,7 +44,7 @@ class FireStoreRepository @Inject constructor(
         private lateinit var dogCollection: List<Dog>
         private var dogListApp: MutableList<DogDTO> = mutableListOf()
         private var dogIdUser: MutableList<String> = mutableListOf()
-
+        private var croquettesCache = 0
     }
 
     override suspend fun addDogToUser(dogId: String, croquettes: Int): UiStatus<Boolean> {
@@ -96,22 +95,25 @@ class FireStoreRepository @Inject constructor(
     override fun clearCache() {
         dogIdUser.clear()
         dogListApp.clear()
+        croquettesCache = 0
     }
 
-    override suspend fun getCroquettes(): Flow<Int> = context.preferencesDataStore.data.map { pref ->
-        pref[intPreferencesKey(name = "croquettes")] ?: 0
-    }
-
-    override suspend fun setCroquettes(croquettes: Int) {
-        val old = getCroquettes().first()
-        context.preferencesDataStore.edit { pref ->
-            if (old != 0) {
-                pref[intPreferencesKey(name = "croquettes")] = old + croquettes
-            } else {
-                pref[intPreferencesKey(name = "croquettes")] = croquettes
+    override suspend fun getCroquettes(): Flow<Int> = flow {
+        while (true) {
+            delay(2000L)
+            if (croquettesCache == 0) {
+                croquettesCache = fireStore.getCroquettes()
             }
+            emit(croquettesCache)
         }
+    }
 
+    override suspend fun setCroquettes(croquettes: Int):Boolean {
+       val resp:Boolean = fireStore.addCroquettes(croquettes)
+           if(resp){
+               croquettesCache =+ croquettes
+           }
+           return resp
     }
 
     override suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>> {
@@ -149,6 +151,9 @@ class FireStoreRepository @Inject constructor(
             }
             val delete = deferred.await()
             if(delete){
+                setCroquettes(croquettesCache)
+                context.setZeroAdRewardClick()
+                croquettesCache = 0
                 dogIdUser.addAll(list)
             }
 

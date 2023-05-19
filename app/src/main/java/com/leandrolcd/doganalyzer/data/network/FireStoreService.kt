@@ -14,6 +14,10 @@ class FireStoreService @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val loginService: LoginService
 ) {
+    val newUser = hashMapOf(
+        "DogList" to arrayListOf<String>(),
+        "CroquettesCount" to 0
+    )
     @SuppressLint("SuspiciousIndentation")
     suspend fun getDogListApp(): List<DogDTO> {
         val dogList = mutableListOf<DogDTO>()
@@ -91,9 +95,7 @@ class FireStoreService @Inject constructor(
             val snapshot = db.get().await()
             if (!snapshot.exists()) {
                 // El documento no existe, crea un nuevo documento con el ID de usuario y la lista de perros vacía
-                val newUser = hashMapOf(
-                    "DogList" to arrayListOf<String>()
-                )
+
                 db.set(newUser).await()
             }
 
@@ -109,6 +111,35 @@ class FireStoreService @Inject constructor(
             return true
         }
         return false
+    }
+    suspend fun addCroquettes(croquettes: Int): Boolean {
+        val user = loginService.getUser()
+        user?.run {
+            val db = fireStore.collection("Users").document(uid)
+            val snapshot = db.get().await()
+            if (!snapshot.exists()) {
+                 db.set(newUser).await()
+            } else {
+
+                 val currentCroquettesCount = snapshot.getLong("CroquettesCount") ?: 0
+                val newCroquettesCount = currentCroquettesCount + croquettes
+                db.update("CroquettesCount", newCroquettesCount).await()
+            }
+            return true
+        }
+        return false
+    }
+    suspend fun getCroquettes(): Int {
+        val user = loginService.getUser()
+        user?.let {
+            val db = fireStore.collection("Users").document(it.uid)
+            val snapshot = db.get().await()
+            if (snapshot.exists()) {
+                return snapshot.getLong("CroquettesCount")?.toInt() ?: 0
+            }
+            return 0
+        }
+        return 0
     }
 
 

@@ -83,15 +83,8 @@ fun DogListScreen(
             viewModel.uiStatus.collect { value = it }
         }
     }
-    val croquettesCount by produceState(
-        initialValue = 0,
-        key1 = lifecycle,
-        key2 = viewModel
-    ) {
-        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            viewModel.croquettes.collect { value = it }
-        }
-    }
+    val croquettesCount = viewModel.croquettes
+
 
     when (uiState) {
         is UiStatus.Error -> {
