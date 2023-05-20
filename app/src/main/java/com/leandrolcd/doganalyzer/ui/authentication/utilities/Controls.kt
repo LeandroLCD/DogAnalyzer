@@ -44,8 +44,6 @@ import com.leandrolcd.doganalyzer.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.doganalyzer.ui.dogdetail.TitleDialog
 import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.ui.theme.*
-import com.leandrolcd.doganalyzer.ui.utilits.LANGUAGE
-import com.leandrolcd.doganalyzer.ui.utilits.isSpanish
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlin.math.floor
@@ -337,11 +335,7 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
             },
             text = {
                 Text(
-                    text = if (LANGUAGE.isSpanish()) {
-                        stringResource(R.string.update_require_es)
-                    } else {
-                        stringResource(R.string.update_require_en)
-                    },
+                    text = stringResource(R.string.update_require),
                     fontSize = 16.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Medium,

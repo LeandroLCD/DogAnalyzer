@@ -46,6 +46,7 @@ import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.perfil.ProfileScreen
 import com.leandrolcd.doganalyzer.ui.ui.theme.DogedexMVVMTheme
+import com.leandrolcd.doganalyzer.ui.utilits.SERVER_CLIENT_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
@@ -152,7 +153,7 @@ class MainActivity : ComponentActivity() {
     private fun onLoginWithGoogleClicked() {
 
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.server_client_id))
+            .requestIdToken(SERVER_CLIENT_ID)
             .requestEmail()
             .build()
 

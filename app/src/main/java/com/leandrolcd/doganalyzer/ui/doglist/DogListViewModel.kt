@@ -1,15 +1,17 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
 import com.leandrolcd.doganalyzer.domain.IGetDogListUseCase
 import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
@@ -19,9 +21,11 @@ import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
 import com.leandrolcd.doganalyzer.ui.utilits.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -40,7 +44,7 @@ class DogListViewModel@Inject constructor(
     var cameraX = mutableStateOf(cameraX)
         private set
 
-    lateinit var uiStatus: StateFlow<UiStatus<List<Dog>>>
+    var uiStatus by mutableStateOf<UiStatus<List<Dog>>>(UiStatus.Loading())
 
 
 
@@ -71,17 +75,22 @@ class DogListViewModel@Inject constructor(
     }
 
     private fun startStatus(){
+
         viewModelScope.launch(dispatcher) {
 
-            uiStatus = dogUseCase().map(::Success)
-                .catch { Error(it) }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), UiStatus.Loading())
-              dogUseCase.getCroquettes().collect{
-                  croquettes = it
+             dogUseCase().collect{
+                 try {
+                     uiStatus = Success(it)
+                 }catch (e:Exception){
+                     Error(e)
+                 }
+             }
+        }
+
+        viewModelScope.launch(dispatcher) {
+            dogUseCase.getCroquettes().collect{
+                croquettes = it
             }
-
-
-
         }
     }
     fun recognizerImage(imageProxy: ImageProxy) {
@@ -91,9 +100,12 @@ class DogListViewModel@Inject constructor(
             imageProxy.close()
         }
     }
-    fun onUnCoverRequest(mlId: String) {
+    fun onUnCoverRequest(mlId: String, croquettes:Int) {
         viewModelScope.launch {
-            dogUseCase.addDogByMlId(mlId, 0)
+            dogUseCase.addDogByMlId(mlId, croquettes * -1)
+            withContext(Dispatchers.Main){
+                Toast.makeText(contextApp, contextApp.getString(R.string.dog_reward), Toast.LENGTH_LONG).show()
+            }
         }
     }
 

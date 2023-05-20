@@ -17,7 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.outlined.House
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,8 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
@@ -70,25 +68,17 @@ fun DogListScreen(
     navHostController: NavHostController,
     viewModel: DogListViewModel = hiltViewModel()
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
     val activity = LocalContext.current as Activity
     viewModel.navHostController = navHostController
 
-    val uiState by produceState<UiStatus<List<Dog>>>(
-        initialValue = UiStatus.Loading(),
-        key1 = lifecycle,
-        key2 = viewModel
-    ) {
-        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            viewModel.uiStatus.collect { value = it }
-        }
-    }
+    val uiState: UiStatus<List<Dog>> = viewModel.uiStatus
     val croquettesCount = viewModel.croquettes
 
 
     when (uiState) {
         is UiStatus.Error -> {
-            ErrorLoginScreen(message = (uiState as UiStatus.Error<List<Dog>>).message) {
+            ErrorLoginScreen(message = uiState.message) {
                 activity.finish()
             }
         }
@@ -98,7 +88,7 @@ fun DogListScreen(
         is UiStatus.Success -> {
             DogListContent(
                 navHostController,
-                dogList = (uiState as UiStatus.Success<List<Dog>>).data,
+                dogList = uiState.data,
                 croquettesCount = croquettesCount,
                 viewModel = viewModel
             ) {
@@ -154,7 +144,7 @@ fun DogListContent(
         floatingActionButton = {
             if (index == 1) {
                 val dog = viewModel.dogRecognition.value.first()
-                ButtonCamera(dog.confidence > 60) {
+                ButtonCamera(dog.confidence > 70) {
                     navHostController.navigate(
                         Routes.ScreenDogDetail.routeName(
                             true,
@@ -213,7 +203,7 @@ fun DogListContent(
             arrayCroquettes = arrayOf(dogSelect?.croquettes ?: 0, croquettesCount)
         ) {
             if (dogSelect != null && croquettesCount > (dogSelect?.croquettes ?: 0)) {
-                viewModel.onUnCoverRequest(dogSelect!!.mlId)
+                viewModel.onUnCoverRequest(dogSelect!!.mlId, dogSelect!!.croquettes)
             } else {
                 Toast.makeText(context, "Insufficient Croquettes", Toast.LENGTH_LONG).show()
             }
@@ -361,22 +351,14 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
     ) {
         BottomNavigationItem(selected = index == 0, onClick = { onClickSelect(0) }, icon = {
             Icon(
-                imageVector = Icons.Default.List,
+                imageVector = Icons.Outlined.House,
                 contentDescription = stringResource(R.string.dog)
-            )
-        }, label = {
-            Text(
-                text = stringResource(R.string.home)
             )
         }, unselectedContentColor = textColor)
         BottomNavigationItem(selected = index == 1, onClick = { onClickSelect(1) }, icon = {
             Icon(
-                imageVector = Icons.Outlined.PhotoCamera,
+                imageVector = Icons.Outlined.PhotoCamera, //PhotoCamera
                 contentDescription = stringResource(R.string.camera)
-            )
-        }, label = {
-            Text(
-                text = "Camera"
             )
         }, unselectedContentColor = textColor)
     }
@@ -405,12 +387,8 @@ fun StoreDialog(
                 Box{
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         TextDescription(
-                            textSp = stringResource(
-                                id = R.string.store_description_Es,
-                                formatArgs = arrayCroquettes
-                            ),
-                            textEn = stringResource(
-                                R.string.store_description_En,
+                            text = stringResource(
+                                id = R.string.store_description,
                                 formatArgs = arrayCroquettes
                             ),
                             fontSize = 16.sp, textAlign = TextAlign.Justify,
@@ -478,11 +456,8 @@ fun CroquettesDialog(
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     TextDescription(
-                        textSp = stringResource(
-                            id = R.string.dog_store_message_ES
-                        ),
-                        textEn = stringResource(
-                            R.string.dog_store_message_En
+                        text = stringResource(
+                            id = R.string.dog_store_message
                         ),
                         fontSize = 16.sp, textAlign = TextAlign.Justify,
                         color = if (isSystemInDarkTheme()) {

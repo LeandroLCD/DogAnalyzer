@@ -1,7 +1,6 @@
 package com.leandrolcd.doganalyzer.data.network
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -14,22 +13,24 @@ class FireStoreService @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val loginService: LoginService
 ) {
-    val newUser = hashMapOf(
+    private val newUser = hashMapOf(
         "DogList" to arrayListOf<String>(),
         "CroquettesCount" to 0
     )
     @SuppressLint("SuspiciousIndentation")
     suspend fun getDogListApp(): List<DogDTO> {
         val dogList = mutableListOf<DogDTO>()
-        val querySnapshot = fireStore.collection("DogListApp")
-            .get()
-            .await()
+        val user = loginService.getUser()
+        user?.let {
+            val querySnapshot = fireStore.collection("DogListApp")
+                .get()
+                .await()
 
-        Log.d("TAG", "getDogListApp: ${querySnapshot.documents}")
-        for (document in querySnapshot.documents) {
-            val dog = document.toObject<DogDTO>()
-            dog?.let {
-                dogList.add(it)
+            for (document in querySnapshot.documents) {
+                val dog = document.toObject<DogDTO>()
+                dog?.let {
+                    dogList.add(it)
+                }
             }
         }
 

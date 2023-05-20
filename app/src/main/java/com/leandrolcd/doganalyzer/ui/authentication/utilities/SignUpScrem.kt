@@ -1,6 +1,9 @@
 package com.leandrolcd.doganalyzer.ui.authentication.utilities
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -17,10 +20,12 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -35,7 +40,6 @@ import com.leandrolcd.doganalyzer.ui.model.UiStatus
 import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.math.floor
-
 
 
 @ExperimentalCoroutinesApi
@@ -62,6 +66,33 @@ fun SignUpScreen(
 
         }
     }
+
+    OnBackToPressedToProfile(navigationController)
+}
+@SuppressLint("SuspiciousIndentation")
+@Composable
+fun OnBackToPressedToProfile(navController: NavHostController) {
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current
+
+            DisposableEffect(Unit) {
+                val callback = object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        // Realiza la navegación a la pantalla A
+                        navController.navigate(Routes.ScreenProfile.route) {
+                            // Limpiar la pila de navegación
+                            popUpTo(navController.graph.startDestinationRoute!!) {
+                                saveState = true
+                            }
+                        }
+                    }
+                }
+
+                backDispatcher?.onBackPressedDispatcher?.addCallback(callback)
+
+                onDispose {
+                    callback.remove()
+                }
+            }
 
 
 }
@@ -123,6 +154,7 @@ fun MyFooter(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
     Column(
@@ -155,6 +187,7 @@ fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation('*'),
             onComplete = { isPlaying = false }
         )
+        val keyboardController = LocalSoftwareKeyboardController.current
         PasswordFields(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(R.string.confirm_password),
@@ -162,7 +195,8 @@ fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
             icons = { MyIcon(Icons.Outlined.Key) },
             onValueChange = { viewModel.onSignUpChanged(email, password, it) },
             visualTransformation = PasswordVisualTransformation('*'),
-            onComplete = { isPlaying = false }
+            onComplete = { isPlaying = false
+                keyboardController?.hide()}
         )
         if (!enableButton) {
             Text(
@@ -213,7 +247,13 @@ fun MyHeader(
     ) {
         Row(modifier) {
             IconButton(
-                onClick = { navigationController.navigate(Routes.ScreenLogin.route) }) {
+                onClick = {
+                    navigationController.navigate(Routes.ScreenLogin.route){
+                        popUpTo(Routes.ScreenLogin.route){
+                            inclusive = true
+                        }
+                    }
+                }) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowBackIos,
                     contentDescription = stringResource(R.string.bach_to_login),

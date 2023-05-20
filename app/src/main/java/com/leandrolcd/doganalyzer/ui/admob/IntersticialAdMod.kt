@@ -9,7 +9,8 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.leandrolcd.doganalyzer.R
+import com.leandrolcd.doganalyzer.ui.utilits.INTERSTICIAL_ID_DEBUG
+import com.leandrolcd.doganalyzer.ui.utilits.INTERSTICIAL_ID_RELEASE
 import com.leandrolcd.doganalyzer.ui.utilits.IS_DEBUG
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ class InterstitialAdMod @Inject constructor(){
     fun load(context: Context) {
     InterstitialAd.load(
         context,
-        context.getString(if(IS_DEBUG) R.string.interstitial_id_debug else R.string.interstitial_release), //Change this with your own AdUnitID!
+        if(IS_DEBUG) INTERSTICIAL_ID_DEBUG else INTERSTICIAL_ID_RELEASE, //Change this with your own AdUnitID!
         AdRequest.Builder().build(),
         object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {

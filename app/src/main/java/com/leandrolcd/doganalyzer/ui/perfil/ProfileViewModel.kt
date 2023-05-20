@@ -44,12 +44,10 @@ private val dataStore: IFireStoreRepository):ViewModel() {
 
     fun logout() {
         viewModelScope.launch {
+
             loginRepository.logout()
             dataStore.clearCache()
-            dataStore.getCroquettes().apply {
-                    dataStore.setCroquettes(this.first() *- 1)
-                }
-            }
+        }
 
     }
 

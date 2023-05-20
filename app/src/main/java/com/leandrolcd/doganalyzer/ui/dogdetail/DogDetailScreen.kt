@@ -325,8 +325,7 @@ fun MyTopAppBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextTitle(
-                        textSp = "Probabilidad $confidence %",
-                        textEn = "Probability $confidence %",
+                        text = stringResource(R.string.probability, confidence),
                         fontSize = 16.sp,
                         color = primaryColor
                     )
@@ -426,12 +425,10 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
                     .width(200.dp)
             )
             TextTitle(
-                textEn = "${dog.lifeExpectancy} year",
-                textSp = "${dog.lifeExpectancy} años"
+                text = stringResource(R.string.dog_life_expectancy, dog.lifeExpectancy),
             )
             TextTitle(
-                textEn = "Race: ${dog.race}",
-                textSp = "Raza: ${dog.raceEs}"
+                text = stringResource(R.string.dog_race, dog.race)
             )
             if (index == 0) {
                 DogCharacteristics(dog, Modifier)
@@ -475,8 +472,7 @@ fun DogCuriosities(textEn: String, textSp: String, modifier: Modifier = Modifier
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextTitle(
-                    textSp = "Curiosidades",
-                    textEn = "Curiosities",
+                    text= stringResource(R.string.dog_curiosities),
                     fontSize = 24.sp
                 )
                 Text(
@@ -529,15 +525,17 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 
             ) {
             TextTitle(
-                textSp = "Caracteristicas",
-                textEn = "Characteristics",
+                text = stringResource(R.string.dog_characteristics),
                 fontSize = 24.sp,
                 Modifier.padding(bottom = 8.dp)
             )
-
+            val description = if(LANGUAGE.isSpanish()){
+                dog.temperamentEs
+            }else{
+                dog.temperament
+            }
             TextDescription(
-                textSp = dog.temperamentEs,
-                textEn = dog.temperament,
+                text = description,
                 textAlign = TextAlign.Center
             )
             ColumnDetail(
@@ -556,19 +554,14 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 
 @Composable
 fun TextTitle(
-    textSp: String,
-    textEn: String,
+    text: String,
     fontSize: TextUnit = 16.sp,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
     color: Color = textColor
 ) {
     Text(
-        text = if (LANGUAGE.isSpanish()) {
-            textSp
-        } else {
-            textEn
-        },
+        text = text,
         fontSize = fontSize,
         color = color,
         fontWeight = FontWeight.Medium,
@@ -579,19 +572,14 @@ fun TextTitle(
 
 @Composable
 fun TextDescription(
-    textSp: String,
-    textEn: String,
+    text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
     fontSize: TextUnit = 16.sp,
     color: Color = textColor
 ) {
     Text(
-        text = if (LANGUAGE.isSpanish()) {
-            textSp
-        } else {
-            textEn
-        },
+        text = text,
         fontSize = fontSize,
         color = color,
         textAlign = textAlign,
@@ -678,38 +666,38 @@ fun ColumnDetail(dog: Dog, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         Row(Modifier.padding(top = 16.dp)) {
-            TextTitle(textSp = "Sexo", textEn = "Sex", modifier = Modifier.weight(1f))
-            TextTitle(textSp = "Peso", textEn = "Weigh", modifier = Modifier.weight(1f))
-            TextTitle(textSp = "Altura", textEn = "Height", modifier = Modifier.weight(1f))
+            TextTitle(text = stringResource(R.string.dog_sex), modifier = Modifier.weight(1f))
+            TextTitle(text= stringResource(R.string.dog_weigh), modifier = Modifier.weight(1f))
+            TextTitle(text = stringResource(R.string.dog_height), modifier = Modifier.weight(1f))
         }
         Row() {
             TextTitle(
-                textSp = "Macho", textEn = "Male",
+                text = stringResource(R.string.dog_male),
                 modifier = Modifier.weight(1f)
             )
             TextDescription(
-                textSp = dog.weightMaleEs, textEn = dog.weightMale,
+                text = if(LANGUAGE.isSpanish()) dog.weightMaleEs else dog.weightMale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
             TextDescription(
-                textSp = dog.heightMaleEs, textEn = dog.heightMale,
+                text =if(LANGUAGE.isSpanish()) dog.heightMaleEs else dog.heightMale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
         }
         Row() {
             TextTitle(
-                textSp = "Hembra", textEn = "Female",
+                text= stringResource(R.string.dog_female),
                 modifier = Modifier.weight(1f)
             )
             TextDescription(
-                textSp = dog.weightFemaleEs, textEn = dog.weightFemale,
+                text = if(LANGUAGE.isSpanish()) dog.weightFemaleEs else dog.weightFemale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
             TextDescription(
-                textSp = dog.heightFemaleEs, textEn = dog.heightFemale,
+                text = if(LANGUAGE.isSpanish()) dog.heightFemaleEs else dog.heightFemale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )

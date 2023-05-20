@@ -147,12 +147,10 @@ fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostContro
             val email = if (user?.email?.isNotEmpty() == true) user.email else "Anonymous"
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 TextTitle(
-                    textSp = stringResource(R.string.account_Es),
-                    textEn = stringResource(R.string.account_En), color = Color.Black
+                    text = stringResource(R.string.account)
                 )
                 TextDescription(
-                    textSp = email!!,
-                    textEn = email,
+                    text = email!!,
                     Modifier.padding(horizontal = 8.dp)
                 )
             }
@@ -164,20 +162,19 @@ fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostContro
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextTitle(
-                    textSp = stringResource(R.string.croquettes_Es),
-                    textEn = stringResource(R.string.croquettes_En), color = Color.Black,
+                    text = stringResource(R.string.croquettes),
+                    color = Color.Black,
                     fontSize = 30.sp,
 
                     )
                 Icon(
                     painter = painterResource(id = R.drawable.croquette),
-                    contentDescription = stringResource(id = R.string.croquettes_En),
+                    contentDescription = stringResource(id = R.string.croquettes),
                     modifier = Modifier.size(50.dp), tint = Marron
                 )
 
                 TextDescription(
-                    textSp = croquettesCount.toString(),
-                    textEn = croquettesCount.toString(),
+                    text = croquettesCount.toString(),
                     Modifier.padding(horizontal = 8.dp),
                     color = Color.Black,
                     fontSize = 30.sp,
@@ -202,7 +199,7 @@ fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostContro
                 if (user?.isAnonymous == true) {
 
                     MyButton(
-                        label = stringResource(id = R.string.link_account_En),
+                        label = stringResource(id = R.string.link_account),
                         isButtonEnabled = true
                     ) {
                         // navController.popBackStack()

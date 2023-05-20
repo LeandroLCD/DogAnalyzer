@@ -11,6 +11,8 @@ import javax.inject.Inject
 interface IGetDogListUseCase{
     suspend operator fun invoke(): Flow<List<Dog>>
     suspend fun addDogByMlId(mlId:String, croquettes: Int): UiStatus<Boolean>
+
+    suspend fun addDogForReward(mlId:String, croquettes: Int): UiStatus<Boolean>
     suspend fun setCroquettes(croquettes:Int)
     suspend fun getCroquettes():Flow<Int>
     fun clearCache()
@@ -29,6 +31,10 @@ class GetDogListUseCase @Inject constructor(
 
     override suspend fun addDogByMlId(mlId: String, croquettes: Int):UiStatus<Boolean> =
         repository.addDogToUser(mlId, croquettes)
+
+    override suspend fun addDogForReward(mlId: String, croquettes: Int): UiStatus<Boolean> =
+        repository.addDogToUser(mlId, croquettes)
+
 
     override fun clearCache() = repository.clearCache()
 

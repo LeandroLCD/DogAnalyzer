@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,14 +56,11 @@ fun LoginScreen(
     when (val status = viewModel.uiStatus.value) {
         is UiStatus.Error -> {
             ErrorLoginScreen(status.message) { viewModel.onTryAgain() }
-            Log.d("LoginScreen", "Status: Error")
         }
         is UiStatus.Loaded -> {
             LoginContent(viewModel, navigationController, onLoginWithGoogleClicked)
-            Log.d("LoginScreen", "Status: Loaded")
         }
         is UiStatus.Loading -> {
-            Log.d("LoginScreen", "Status: Loading")
             LoadingScreen()
         }
         is UiStatus.Success -> {
@@ -74,6 +73,7 @@ fun LoginScreen(
 
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalCoroutinesApi
 @Composable
 fun LoginContent(
@@ -90,6 +90,7 @@ fun LoginContent(
     }
 }
 
+@ExperimentalComposeUiApi
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun MyCardLogin(
@@ -200,13 +201,20 @@ fun FooterLogin(
                 onLoginWithGoogleClicked()
             }
             SignUp(Modifier) {
-                navigationController.navigate(Routes.ScreenSignUp.route)
+
+                navigationController.navigate(Routes.ScreenSignUp.route){
+                    popUpTo(Routes.ScreenLogin.route){
+                        inclusive = true
+                    }
+                }
+
             }
         }
     }
-
+    OnBackToPressedToProfile(navigationController)
 }
 
+@ExperimentalComposeUiApi
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun BodyLogin(
@@ -217,7 +225,7 @@ fun BodyLogin(
 ) {
     val email = viewModel.email.value
     val password = viewModel.password.value
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier
             .padding(16.dp)
@@ -242,7 +250,10 @@ fun BodyLogin(
                 viewModel.onLoginChange(email, it)
             },
             visualTransformation = PasswordVisualTransformation('*'),
-            onComplete = { onComplete() }
+            onComplete = {
+                onComplete()
+                keyboardController?.hide()
+            }
 
         )
         ForgotPassword(modifier = Modifier

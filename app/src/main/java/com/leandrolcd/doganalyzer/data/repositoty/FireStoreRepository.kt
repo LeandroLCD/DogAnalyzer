@@ -1,6 +1,7 @@
 package com.leandrolcd.doganalyzer.data.repositoty
 
 import android.content.Context
+import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.core.makeNetworkCall
 import com.leandrolcd.doganalyzer.data.dto.DogDTO
 import com.leandrolcd.doganalyzer.data.network.FireStoreService
@@ -8,7 +9,6 @@ import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.UiStatus
 import com.leandrolcd.doganalyzer.ui.utilits.isNetworkConnected
-import com.leandrolcd.doganalyzer.ui.utilits.setAdRewardClick
 import com.leandrolcd.doganalyzer.ui.utilits.setZeroAdRewardClick
 import com.leandrolcd.doganalyzer.ui.utilits.toDog
 import com.leandrolcd.doganalyzer.ui.utilits.toDogList
@@ -49,9 +49,7 @@ class FireStoreRepository @Inject constructor(
 
     override suspend fun addDogToUser(dogId: String, croquettes: Int): UiStatus<Boolean> {
         return makeNetworkCall(dispatcher) {
-            if (!isNetworkConnected(context)) {
-                throw Exception("El dispositivo no cuenta con conexión a internet")
-            }
+            connectionChecked()
             val resp = fireStore.addDogIdToUser(dogId)
             if (resp && !dogIdUser.contains(dogId)) {
                 dogIdUser.add(dogId)
@@ -64,12 +62,10 @@ class FireStoreRepository @Inject constructor(
     override suspend fun getDogCollection(): List<Dog> {
 
         return withContext(dispatcher) {
-
+            connectionChecked()
             dogCollection = if (dogListApp.isEmpty()) {
                 val dogUserDeferred = async { fireStore.getDogListUser() }
                 val allDogDeferred = async { fireStore.getDogListApp() }
-                dogListApp.clear()
-                dogIdUser.clear()
                 val dogUser = dogUserDeferred.await()
                 val dogApp = allDogDeferred.await()
                 dogListApp.addAll(dogApp)
@@ -85,9 +81,7 @@ class FireStoreRepository @Inject constructor(
 
     override suspend fun getDogById(id: String): UiStatus<Dog> {
         return makeNetworkCall(dispatcher) {
-            if (!isNetworkConnected(context)) {
-                throw Exception("El dispositivo no cuenta con conexión a internet")
-            }
+            connectionChecked()
             fireStore.getDogById(id).toDog()
         }
     }
@@ -109,18 +103,20 @@ class FireStoreRepository @Inject constructor(
     }
 
     override suspend fun setCroquettes(croquettes: Int):Boolean {
-       val resp:Boolean = fireStore.addCroquettes(croquettes)
+       return withContext(dispatcher){
+           connectionChecked()
+       val deferred = async {fireStore.addCroquettes(croquettes) }
+            val resp = deferred.await()
            if(resp){
-               croquettesCache =+ croquettes
+               croquettesCache += croquettes
            }
-           return resp
+            resp
+        }
     }
 
     override suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>> {
         return makeNetworkCall(dispatcher) {
-            if (!isNetworkConnected(context)) {
-                throw Exception("El dispositivo no cuenta con conexión a internet")
-            }
+            connectionChecked()
             if (dogListApp.isEmpty()) {
                 fireStore.getDogsByIds(list.map { it.id }).toDogList()
             }
@@ -137,6 +133,7 @@ class FireStoreRepository @Inject constructor(
     override suspend fun synchronizeNow(uid: String) {
 
         withContext(dispatcher) {
+            connectionChecked()
           val deferred = async {  fireStore.deleteDataUser(uid) }
             val list = fireStore.getDogListUser()
             if (dogIdUser.isNotEmpty()) {
@@ -161,6 +158,8 @@ class FireStoreRepository @Inject constructor(
 
     }
 
+
+
     private fun getCollectionList(allDogList: List<DogDTO>, userDogList: List<String>): List<Dog> {
         val dog = allDogList.toDogList().map {
             if (userDogList.contains(it.mlId)) {
@@ -171,5 +170,11 @@ class FireStoreRepository @Inject constructor(
             }
         }.sorted().sortedBy { it.index }
         return dog
+    }
+
+    private fun connectionChecked(){
+        if (!isNetworkConnected(context)) {
+            throw Exception(context.getString(R.string.connection_off))
+        }
     }
 }
