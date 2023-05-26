@@ -1,11 +1,14 @@
 package com.leandrolcd.doganalyzer.core.app
 
-import androidx.lifecycle.*
+import androidx.annotation.Keep
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+@Keep
 @Module
 @InstallIn(SingletonComponent::class)
 object LifecycleOwnerModule {
@@ -18,4 +21,3 @@ object LifecycleOwnerModule {
 
 
 }
-

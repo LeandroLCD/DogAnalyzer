@@ -1,11 +1,9 @@
 package com.leandrolcd.doganalyzer.ui.model
 
-import android.os.Parcelable
+
 import com.google.firebase.firestore.Exclude
 
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class Dog(
     var mlId: String = "",
     val croquettes:Int = 0,
@@ -32,8 +30,10 @@ data class Dog(
     @Exclude
     var confidence:Float = 0f
 
-) : Parcelable, Comparable<Dog>{
+) :  Comparable<Dog>{
     override fun compareTo(other: Dog): Int = if (this.mlId != other.mlId) 1 else -1
 
 
+
 }
+

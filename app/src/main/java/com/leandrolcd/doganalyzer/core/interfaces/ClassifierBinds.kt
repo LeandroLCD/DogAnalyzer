@@ -1,12 +1,14 @@
 package com.leandrolcd.doganalyzer.core.interfaces
 
-import com.leandrolcd.doganalyzer.data.repositoty.ClassifierRepository
-import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
+import androidx.annotation.Keep
+import com.leandrolcd.doganalyzer.data.repository.ClassifierRepository
+import com.leandrolcd.doganalyzer.data.repository.IClassifierRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+@Keep
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ClassifierBinds {

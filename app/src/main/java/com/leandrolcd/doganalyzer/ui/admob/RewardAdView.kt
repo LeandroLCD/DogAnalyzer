@@ -2,6 +2,7 @@ package com.leandrolcd.doganalyzer.ui.admob
 
 import android.app.Activity
 import android.util.Log
+import androidx.annotation.Keep
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
@@ -9,22 +10,24 @@ import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.ui.utilits.IS_DEBUG
+import com.leandrolcd.doganalyzer.utility.IS_DEBUG
 import javax.inject.Inject
 
+@Keep
 class RewardAdView @Inject constructor() {
-    companion object{
+    companion object {
         var rewardedAd: RewardedAd? = null
     }
 
-    fun load(context: Activity){
-        val unitId = context.getString(if (IS_DEBUG) R.string.reward_id else R.string.reward_id_release)
+    fun load(context: Activity) {
+        val unitId =
+            context.getString(if (IS_DEBUG) R.string.reward_id else R.string.reward_id_release)
 
         RewardedAd.load(
             context,
             unitId,
             AdManagerAdRequest.Builder().build(),
-            object: RewardedAdLoadCallback() {
+            object : RewardedAdLoadCallback() {
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     Log.e("Error Admob", p0.message)
@@ -35,7 +38,7 @@ class RewardAdView @Inject constructor() {
                     super.onAdLoaded(p0)
                     p0.setImmersiveMode(true)
 
-                    p0.fullScreenContentCallback = object: FullScreenContentCallback() {
+                    p0.fullScreenContentCallback = object : FullScreenContentCallback() {
                         override fun onAdDismissedFullScreenContent() {
                             super.onAdDismissedFullScreenContent()
                             load(context)
@@ -53,12 +56,12 @@ class RewardAdView @Inject constructor() {
         )
     }
 
-    fun show(context: Activity, onReward:(Int)->Unit){
-        rewardedAd?.show(context){ rewardItem ->
+    fun show(context: Activity, onReward: (Int) -> Unit) {
+        rewardedAd?.show(context) { rewardItem ->
             rewardedAd = null
             load(context)
-            if (rewardItem.amount > 0){
-                    onReward(rewardItem.amount)
+            if (rewardItem.amount > 0) {
+                onReward(rewardItem.amount)
 
             }
         }

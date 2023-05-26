@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,16 +38,23 @@ import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.*
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
+import com.leandrolcd.doganalyzer.ui.auth.ErrorLoginScreen
+import com.leandrolcd.doganalyzer.ui.auth.controls.LoadingScreen
 import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
-import com.leandrolcd.doganalyzer.ui.model.UiStatus
-import com.leandrolcd.doganalyzer.ui.ui.theme.*
-import com.leandrolcd.doganalyzer.ui.utilits.*
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
+import com.leandrolcd.doganalyzer.ui.theme.Purple500
+import com.leandrolcd.doganalyzer.ui.theme.colorGray
+import com.leandrolcd.doganalyzer.ui.theme.primaryColor
+import com.leandrolcd.doganalyzer.ui.theme.textColor
+import com.leandrolcd.doganalyzer.utility.LANGUAGE
+import com.leandrolcd.doganalyzer.utility.isSpanish
+import com.leandrolcd.doganalyzer.utility.setDetailClick
+import com.leandrolcd.doganalyzer.utility.setRecognitionClick
 import kotlin.math.floor
 
+@ExperimentalMaterial3Api
 @ExperimentalCoilApi
 @Composable
 fun DogDetailScreen(
@@ -58,22 +66,22 @@ fun DogDetailScreen(
 
     viewModel.setNavHostController(navController = navController)
     when (val status = viewModel.uiStatus.value) {
-        is UiStatus.Error -> {
-            ErrorLoginScreen(message = (status as UiStatus.Error<*>).message) {
+        is DogUiState.Error -> {
+            ErrorLoginScreen(message = (status as DogUiState.Error<*>).message) {
                 navController.popBackStack()
             }
         }
-        is UiStatus.Loaded -> {
+        is DogUiState.Loaded -> {
             viewModel.getDogsById(dogList)
             val context = LocalContext.current as Activity
             interstitialShow(isRecognition, context) {
                 viewModel.interstitialShow(context)
             }
         }
-        is UiStatus.Loading -> {
+        is DogUiState.Loading -> {
             LoadingScreen(Modifier.fillMaxSize())
         }
-        is UiStatus.Success -> {
+        is DogUiState.Success -> {
             DogContent(navController, isRecognition, dogList.first().id, viewModel)
         }
     }
@@ -148,8 +156,8 @@ fun DogScaffold(
             }
 
 
-        },
-        modifier = Modifier.background(Color.White)
+        }
+
     )
     viewModel.dogStatus.value?.let { dogs ->
         DogDialog(isVisible = isVisible, dogList = dogs,
@@ -345,7 +353,7 @@ fun MyTopAppBar(
 @Composable
 fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
 
-    val language = LANGUAGE
+
     BottomAppBar(
         modifier = Modifier.background(Color.White),
         backgroundColor = primaryColor,
@@ -356,37 +364,20 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
         BottomNavigationItem(selected = index == 0, onClick = { onClickSelect(0) }, icon = {
             Icon(
                 imageVector = Icons.Outlined.MedicalInformation,
-                contentDescription = if (language.isSpanish()) {
-                    "Caracteristicas"
-                } else {
-                    "Characteristics"
-                }
-            )
-        }, label = {
+                contentDescription = stringResource(id = R.string.dog_characteristics))
+            }, label = {
             Text(
-                text = if (language.isSpanish()) {
-                    "Caracteristicas"
-                } else {
-                    "Characteristics"
-                }
+                text = stringResource(id = R.string.dog_characteristics)
             )
         }, unselectedContentColor = textColor)
         BottomNavigationItem(selected = index == 1, onClick = { onClickSelect(1) }, icon = {
             Icon(
                 imageVector = Icons.Outlined.QuestionMark,
-                contentDescription = if (language.isSpanish()) {
-                    "Curiosidades"
-                } else {
-                    "Curiosities"
-                }
+                contentDescription = stringResource(id = R.string.dog_curiosities)
             )
         }, label = {
             Text(
-                text = if (language.isSpanish()) {
-                    "Curiosidades"
-                } else {
-                    "Curiosities"
-                }
+                text = stringResource(id = R.string.dog_curiosities)
             )
         }, unselectedContentColor = textColor)
     }
@@ -556,7 +547,7 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 fun TextTitle(
     text: String,
     fontSize: TextUnit = 16.sp,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
     color: Color = textColor
 ) {

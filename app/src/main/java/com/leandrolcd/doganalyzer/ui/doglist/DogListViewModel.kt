@@ -12,13 +12,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
-import com.leandrolcd.doganalyzer.domain.IGetDogListUseCase
+import com.leandrolcd.doganalyzer.data.repository.ICameraRepository
+import com.leandrolcd.doganalyzer.data.repository.IClassifierRepository
+import com.leandrolcd.doganalyzer.data.repository.IFireStoreRepository
 import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
-import com.leandrolcd.doganalyzer.ui.camera.ICameraX
 import com.leandrolcd.doganalyzer.ui.model.*
-import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
-import com.leandrolcd.doganalyzer.ui.utilits.*
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
+import com.leandrolcd.doganalyzer.utility.getAdRewardClick
+import com.leandrolcd.doganalyzer.utility.getDateAdReward
+import com.leandrolcd.doganalyzer.utility.setAdRewardClick
+import com.leandrolcd.doganalyzer.utility.setDateAdReward
+import com.leandrolcd.doganalyzer.utility.toDay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -30,12 +34,11 @@ import java.util.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-@Suppress("ThrowableNotThrown")
 @HiltViewModel
 class DogListViewModel@Inject constructor(
-    cameraX: ICameraX,
+    cameraX: ICameraRepository,
     private val classifierRepository: IClassifierRepository,
-    private val dogUseCase: IGetDogListUseCase,
+    private val repository: IFireStoreRepository,
     private val rewardAdView: RewardAdView,
     private val contextApp: Context,
     private val dispatcher: CoroutineDispatcher
@@ -44,8 +47,8 @@ class DogListViewModel@Inject constructor(
     var cameraX = mutableStateOf(cameraX)
         private set
 
-    var uiStatus by mutableStateOf<UiStatus<List<Dog>>>(UiStatus.Loading())
-
+    var uiStatus by mutableStateOf<DogUiState<DogListScreen>>(DogUiState.Loading())
+        private set
 
 
     lateinit var navHostController: NavHostController
@@ -53,8 +56,6 @@ class DogListViewModel@Inject constructor(
     val dogRecognition = mutableStateOf(listOf(DogRecognition("", 0f)))
 
     var counterAdReward by mutableStateOf(0)
-        private set
-    var croquettes by mutableStateOf(0)
         private set
 
     init {
@@ -78,18 +79,8 @@ class DogListViewModel@Inject constructor(
 
         viewModelScope.launch(dispatcher) {
 
-             dogUseCase().collect{
-                 try {
-                     uiStatus = Success(it)
-                 }catch (e:Exception){
-                     Error(e)
-                 }
-             }
-        }
-
-        viewModelScope.launch(dispatcher) {
-            dogUseCase.getCroquettes().collect{
-                croquettes = it
+            repository.getDogListAndCroquettes().collect{
+                uiStatus = it
             }
         }
     }
@@ -102,7 +93,7 @@ class DogListViewModel@Inject constructor(
     }
     fun onUnCoverRequest(mlId: String, croquettes:Int) {
         viewModelScope.launch {
-            dogUseCase.addDogByMlId(mlId, croquettes * -1)
+            repository.addDogToUser(mlId, croquettes * -1)
             withContext(Dispatchers.Main){
                 Toast.makeText(contextApp, contextApp.getString(R.string.dog_reward), Toast.LENGTH_LONG).show()
             }
@@ -112,7 +103,7 @@ class DogListViewModel@Inject constructor(
     fun onRewardShow(context: Activity){
         rewardAdView.show(context) {
                     viewModelScope.launch {
-                dogUseCase.setCroquettes(it)
+                repository.setCroquettes(it)
                         context.setAdRewardClick(1)
                         counterAdReward = contextApp.getAdRewardClick()
             }

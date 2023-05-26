@@ -1,15 +1,17 @@
 package com.leandrolcd.doganalyzer.core.interfaces
 
-import com.leandrolcd.doganalyzer.ui.camera.CameraX
-import com.leandrolcd.doganalyzer.ui.camera.ICameraX
+import androidx.annotation.Keep
+import com.leandrolcd.doganalyzer.data.repository.CameraRepository
+import com.leandrolcd.doganalyzer.data.repository.ICameraRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+@Keep
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class CameraXBinds {
     @Binds
-    abstract fun bindsCameraX(cameraX: CameraX):ICameraX
+    abstract fun bindsCameraX(cameraX: CameraRepository):ICameraRepository
 }

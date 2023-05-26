@@ -10,11 +10,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -22,19 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.MyButton
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.SemiCircularGauge
+import com.leandrolcd.doganalyzer.ui.auth.SemiCircularGauge
+import com.leandrolcd.doganalyzer.ui.auth.controls.MyButton
 import com.leandrolcd.doganalyzer.ui.dogdetail.TextDescription
 import com.leandrolcd.doganalyzer.ui.dogdetail.TextTitle
 import com.leandrolcd.doganalyzer.ui.model.Routes
 import com.leandrolcd.doganalyzer.ui.model.Values
-import com.leandrolcd.doganalyzer.ui.ui.theme.Marron
-import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
+import com.leandrolcd.doganalyzer.ui.theme.Marron
+import com.leandrolcd.doganalyzer.ui.theme.primaryColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
@@ -50,7 +46,7 @@ fun ProfileScreen(navController: NavHostController, viewModel: ProfileViewModel 
         val (header, body, backButton) = createRefs()
         val topGuide = createGuidelineFromTop(0.35f)
 
-        IconButton(onClick = { navController.popBackStack() },
+        IconButton(onClick = { navController.popBackStack(Routes.ScreenDogList.route, inclusive = false) },
                     modifier = Modifier.constrainAs(backButton){
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
@@ -112,26 +108,9 @@ fun ProfileAnimation() {
 @Composable
 fun ProfileInformation(viewModel: ProfileViewModel, navController: NavHostController) {
     val user = viewModel.userCurrent
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    val dogCount by produceState(
-        initialValue = 0,
-        key1 = lifecycle,
-        key2 = viewModel
-    ) {
-        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            viewModel.dogCollection.collect { value = it }
-        }
-    }
-    val croquettesCount by produceState(
-        initialValue = 0,
-        key1 = lifecycle,
-        key2 = viewModel
-    ) {
-        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            viewModel.croquettes.collect { value = it }
-        }
-    }
+    val dogCount = viewModel.dogCollection
+    val croquettesCount = viewModel.croquettes
 
 
     Card(

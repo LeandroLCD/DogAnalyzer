@@ -52,5 +52,5 @@
     <string name="dog_height">Altura</string>
     <string name="dog_male">Macho</string>
     <string name="connection_off">El dispositivo no cuenta con conexión a internet.</string>
-
+    <string name="an_error_google">Se produjo un error al intentar ingresar con google.</string>
 </resources>

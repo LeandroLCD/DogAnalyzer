@@ -3,9 +3,7 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
 import android.app.Activity
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,12 +19,13 @@ import androidx.compose.material.icons.outlined.House
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,30 +38,25 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.ui.MainActivity.Companion.MAXADSREWARD
 import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
-import com.leandrolcd.doganalyzer.ui.camera.ButtonCamera
-import com.leandrolcd.doganalyzer.ui.camera.CameraCompose
+import com.leandrolcd.doganalyzer.ui.auth.ErrorLoginScreen
+import com.leandrolcd.doganalyzer.ui.auth.controls.LoadingScreen
 import com.leandrolcd.doganalyzer.ui.dogdetail.TextDescription
 import com.leandrolcd.doganalyzer.ui.dogdetail.TitleDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
-import com.leandrolcd.doganalyzer.ui.model.UiStatus
-import com.leandrolcd.doganalyzer.ui.ui.theme.Marron
-import com.leandrolcd.doganalyzer.ui.ui.theme.Purple500
-import com.leandrolcd.doganalyzer.ui.ui.theme.primaryColor
-import com.leandrolcd.doganalyzer.ui.ui.theme.textColor
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
+import com.leandrolcd.doganalyzer.ui.theme.Marron
+import com.leandrolcd.doganalyzer.ui.theme.Purple500
+import com.leandrolcd.doganalyzer.ui.theme.primaryColor
+import com.leandrolcd.doganalyzer.ui.theme.textColor
+import com.leandrolcd.doganalyzer.utility.MAXADSREWARD
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalCoilApi
-@ExperimentalCoroutinesApi
-@RequiresApi(Build.VERSION_CODES.R)
-@ExperimentalMaterial3Api
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
 @Composable
 fun DogListScreen(
     navHostController: NavHostController,
@@ -72,24 +66,21 @@ fun DogListScreen(
     val activity = LocalContext.current as Activity
     viewModel.navHostController = navHostController
 
-    val uiState: UiStatus<List<Dog>> = viewModel.uiStatus
-    val croquettesCount = viewModel.croquettes
 
-
-    when (uiState) {
-        is UiStatus.Error -> {
+    when (val uiState = viewModel.uiStatus) {
+        is DogUiState.Error -> {
             ErrorLoginScreen(message = uiState.message) {
                 activity.finish()
             }
         }
-        is UiStatus.Loading -> {
+        is DogUiState.Loading -> {
             LoadingScreen()
         }
-        is UiStatus.Success -> {
+        is DogUiState.Success -> {
             DogListContent(
                 navHostController,
-                dogList = uiState.data,
-                croquettesCount = croquettesCount,
+                dogList = uiState.data.dogList,
+                croquettesCount = uiState.data.croquettes,
                 viewModel = viewModel
             ) {
                 navHostController.navigate(
@@ -106,10 +97,8 @@ fun DogListScreen(
 }
 
 @ExperimentalCoilApi
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalCoroutinesApi
-@RequiresApi(Build.VERSION_CODES.R)
-@ExperimentalMaterial3Api
-@ExperimentalMaterialApi
 @Composable
 fun DogListContent(
     navHostController: NavHostController, viewModel: DogListViewModel,
@@ -162,7 +151,7 @@ fun DogListContent(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(it)
+                    .padding(it).background(MaterialTheme.colorScheme.background)
             ) {
                 DogCollection(
                     dogList,
@@ -217,7 +206,6 @@ fun DogListContent(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun DogCollection(
     dogList: List<Dog>,
@@ -241,6 +229,7 @@ fun DogCollection(
     )
 
 }
+
 
 @ExperimentalMaterialApi
 @Composable
@@ -283,7 +272,7 @@ fun ItemDog(dog: Dog, onItemSelected: (Dog) -> Unit, onUnCoverRequest: (Dog) -> 
         ) {
 
             Text(text = "${dog.index}", Modifier.padding(horizontal = 8.dp))
-            DogAnimation(R.raw.error_dog)
+            DogAnimation(R.raw.dog_sleeping)
 
         }
     }
@@ -300,7 +289,8 @@ fun DogAnimation(rawRes: Int, modifier: Modifier = Modifier) {
     LottieAnimation(
         composition = composition,
         progress = progress,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -309,7 +299,7 @@ fun MyTopBar(croquettes: Int = 0, onClickCroquettes: () -> Unit, onClick: () -> 
     TopAppBar(
         title = { Text(text = stringResource(R.string.Title)) },
         backgroundColor = primaryColor,
-        contentColor = Color.White,
+        contentColor = MaterialTheme.colorScheme.onSecondary,
         elevation = 8.dp,
         actions = {
 
@@ -386,17 +376,15 @@ fun StoreDialog(
             text = {
                 Box{
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+
                         TextDescription(
                             text = stringResource(
                                 id = R.string.store_description,
                                 formatArgs = arrayCroquettes
                             ),
                             fontSize = 16.sp, textAlign = TextAlign.Justify,
-                            color = if (isSystemInDarkTheme()) {
-                                Color.White
-                            } else {
-                                Color.Black
-                            }
+                            color = MaterialTheme.colorScheme.inverseSurface
                         )
                         if (viewModel.counterAdReward <= MAXADSREWARD) {
                             PlayAdReward {
@@ -422,7 +410,8 @@ fun StoreDialog(
                 ButtonDialog(text = stringResource(R.string.cancel)) {
                     onDismissRequest()
                 }
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.surface
         )
     }
 }
@@ -483,7 +472,8 @@ fun CroquettesDialog(
                 }, colors = ButtonDefaults.textButtonColors(contentColor = Purple500)) {
                     Text(text = stringResource(R.string.cancel), fontWeight = FontWeight.Bold)
                 }
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.surface
         )
 
     }
@@ -496,6 +486,6 @@ fun PlayAdReward(onRewardRequest: () -> Unit) {
         Modifier
             .size(120.dp, 100.dp), contentAlignment = Alignment.Center
     ) {
-        DogAnimation(rawRes = R.raw.play_ads, Modifier.clickable { onRewardRequest() })
+        DogAnimation(rawRes = R.raw.play, Modifier.clickable { onRewardRequest() })
     }
 }

@@ -52,5 +52,6 @@
     <string name="dog_height">Height</string>
     <string name="dog_male">Male</string>
     <string name="connection_off">The device does not have an internet connection.</string>
+    <string name="an_error_google">An error occurred while trying to sign in with google.</string>
 
 </resources>
