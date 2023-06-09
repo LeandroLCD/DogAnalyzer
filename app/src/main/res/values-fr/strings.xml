@@ -37,7 +37,7 @@
     <string name="dog_store">Magasin</string>
     <string name="uncover">Ouvrir</string>
     <string name="store_description">Pour réveiller ce chiot vous avez besoin de %1$d croquettes, vos croquettes cumulées sont de %2$d.</string>
-    <string name="dog_store_message">Bienvenue au Dog Store, l\'endroit idéal pour les croquettes qui raviront vos chiens ! Vous pouvez vous procurer ces délicieuses croquettes en regardant des publicités ou en scannant des chiens.</string>
+    <string name="dog_store_message">Bienvenue au Dog Store, l\'endroit idéal pour les croquettes que vous pouvez échanger pour réveiller vos chiens! Regardez une vidéo publicitaire pour obtenir une récompense de 3 croquettes.</string>
     <string name="reward_id">ca-app-pub-3940256099942544/5224354917</string>
     <string name="reward_id_release">ca-app-pub-2089536578261112/2486650587</string>
     <string name="dog_reward">Toutes nos félicitations</string>

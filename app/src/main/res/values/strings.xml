@@ -37,7 +37,7 @@
     <string name="dog_store">Dog Store</string>
     <string name="uncover">Unlock</string>
     <string name="store_description">To wake up this puppy you need %1$d croquettes, your accumulated croquettes are %2$d.</string>
-    <string name="dog_store_message">Welcome to the Dog Store, the place to be for kibble that will get your dogs excited! You can get these delicious kibbles by watching ads or by scanning dogs.</string>
+    <string name="dog_store_message">Welcome to the Dog Store, the place to be for kibble that you can redeem to wake up your dogs! Watch an ad video to get a reward of 3 croquettes.</string>
     <string name="reward_id">ca-app-pub-3940256099942544/5224354917</string>
     <string name="reward_id_release">ca-app-pub-2089536578261112/2486650587</string>
     <string name="dog_reward">Congratulations</string>

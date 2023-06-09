@@ -1,8 +1,8 @@
 package com.leandrolcd.doganalyzer.core.interfaces
 
 import androidx.annotation.Keep
-import com.leandrolcd.doganalyzer.data.repository.ClassifierRepository
-import com.leandrolcd.doganalyzer.data.repository.IClassifierRepository
+import com.leandrolcd.doganalyzer.domain.repository.ClassifierRepository
+import com.leandrolcd.doganalyzer.domain.repository.IClassifierRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

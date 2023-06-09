@@ -386,13 +386,9 @@ fun StoreDialog(
                             fontSize = 16.sp, textAlign = TextAlign.Justify,
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
-                        if (viewModel.counterAdReward <= MAXADSREWARD) {
-                            PlayAdReward {
-                                viewModel.onRewardShow(context as Activity)
-                            }
-                        }else{
+
                             DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
-                        }
+
                     }
 
                 }

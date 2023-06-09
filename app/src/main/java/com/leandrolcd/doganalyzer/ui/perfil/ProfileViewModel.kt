@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leandrolcd.doganalyzer.data.repository.IFireStoreRepository
-import com.leandrolcd.doganalyzer.data.repository.LoginRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.LoginRepository
 import com.leandrolcd.doganalyzer.ui.states.DogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

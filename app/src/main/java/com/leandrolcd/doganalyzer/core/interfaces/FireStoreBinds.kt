@@ -1,8 +1,8 @@
 package com.leandrolcd.doganalyzer.core.interfaces
 
 import androidx.annotation.Keep
-import com.leandrolcd.doganalyzer.data.repository.FireStoreRepository
-import com.leandrolcd.doganalyzer.data.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.FireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

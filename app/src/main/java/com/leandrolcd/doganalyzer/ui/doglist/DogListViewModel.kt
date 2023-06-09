@@ -1,6 +1,5 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.widget.Toast
@@ -12,11 +11,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.data.repository.ICameraRepository
-import com.leandrolcd.doganalyzer.data.repository.IClassifierRepository
-import com.leandrolcd.doganalyzer.data.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.ICameraRepository
+import com.leandrolcd.doganalyzer.domain.repository.IClassifierRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
 import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
-import com.leandrolcd.doganalyzer.ui.model.*
+import com.leandrolcd.doganalyzer.ui.model.DogListScreen
+import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.states.DogUiState
 import com.leandrolcd.doganalyzer.utility.getAdRewardClick
 import com.leandrolcd.doganalyzer.utility.getDateAdReward
@@ -27,10 +27,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi

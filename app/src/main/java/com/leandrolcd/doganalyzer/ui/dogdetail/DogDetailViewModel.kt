@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.leandrolcd.doganalyzer.data.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
 import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition

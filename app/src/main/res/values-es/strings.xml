@@ -37,7 +37,7 @@
     <string name="dog_store">Tienda de Mascotas</string>
     <string name="uncover">Despertar</string>
     <string name="store_description">Para despertar este perrito necesitas %1$d croquetas, tus croquetas acumuladas son %2$d.</string>
-    <string name="dog_store_message">¡Bienvenido a Dog Store, el lugar ideal para encontrar croquetas que harán que los perros se despierten con entusiasmo! Puedes obtener estas deliciosas croquetas viendo anuncios o escaneando perros.</string>
+    <string name="dog_store_message">¡Bienvenido a la tienda, el lugar ideal para obtener croquetas que puedes canjear para despertar a sus perros! Mira un video publicitario para obtener una recompensa de 3 croquetas.</string>
      <string name="reward_id">ca-app-pub-3940256099942544/5224354917</string>
     <string name="reward_id_release">ca-app-pub-2089536578261112/2486650587</string>
     <string name="dog_reward">Felicidades</string>
