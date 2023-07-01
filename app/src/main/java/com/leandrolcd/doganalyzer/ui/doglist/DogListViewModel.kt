@@ -1,7 +1,9 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.getValue
@@ -14,6 +16,7 @@ import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.domain.repository.ICameraRepository
 import com.leandrolcd.doganalyzer.domain.repository.IClassifierRepository
 import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.LoginRepository
 import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
 import com.leandrolcd.doganalyzer.ui.model.DogListScreen
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
@@ -39,6 +42,7 @@ class DogListViewModel@Inject constructor(
     private val classifierRepository: IClassifierRepository,
     private val repository: IFireStoreRepository,
     private val rewardAdView: RewardAdView,
+    private val loginRepository: LoginRepository,
     private val contextApp: Context,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -75,13 +79,17 @@ class DogListViewModel@Inject constructor(
     }
 
     private fun startStatus(){
+        val userCurrent = loginRepository.getUser()
+        userCurrent?.apply {
+            viewModelScope.launch(dispatcher) {
 
-        viewModelScope.launch(dispatcher) {
-
-            repository.getDogListAndCroquettes().collect{
-                uiStatus = it
+                repository.getDogListAndCroquettes().collect{
+                    Log.d("TAG", "startStatus: $it")
+                    uiStatus = it
+                }
             }
         }
+
     }
     fun recognizerImage(imageProxy: ImageProxy) {
         viewModelScope.launch {

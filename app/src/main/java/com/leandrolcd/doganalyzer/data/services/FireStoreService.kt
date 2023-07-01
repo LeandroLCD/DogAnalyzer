@@ -44,19 +44,23 @@ class FireStoreService @Inject constructor(
     }
 
     suspend fun getDogListUser(): List<String> {
+        val dogList = mutableListOf<String>()
         val user = loginService.getUser()
-        val querySnapshot = user?.uid?.let { uid ->
+        user?.apply {
+        val querySnapshot = uid.let { uid ->
             val db =
                 fireStore.collection(USERS).document(uid)
             db.get().await()
         }
-        val dogList = mutableListOf<String>()
         if (querySnapshot != null && querySnapshot.exists()) {
             val data = querySnapshot.data
             val dogIds = data?.get(DOGLIST) as? ArrayList<String>
             dogIds?.let {
                 dogList.addAll(it)
             }
+        }
+        return dogList
+
         }
         return dogList
     }

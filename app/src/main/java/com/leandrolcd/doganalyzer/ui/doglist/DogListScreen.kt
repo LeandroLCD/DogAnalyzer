@@ -6,7 +6,6 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -15,16 +14,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.House
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.outlined.House
+import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
@@ -73,9 +73,11 @@ fun DogListScreen(
                 activity.finish()
             }
         }
+
         is DogUiState.Loading -> {
             LoadingScreen()
         }
+
         is DogUiState.Success -> {
             DogListContent(
                 navHostController,
@@ -91,6 +93,7 @@ fun DogListScreen(
                 )
             }
         }
+
         else -> {}
     }
 
@@ -187,7 +190,7 @@ fun DogListContent(
         }
 
         StoreDialog(
-            isVisible = isVisible, viewModel = viewModel,
+            isVisible = isVisible,
             onDismissRequest = { isVisible = false },
             arrayCroquettes = arrayOf(dogSelect?.croquettes ?: 0, croquettesCount)
         ) {
@@ -327,7 +330,7 @@ fun CroquettesIcon(croquettes: Int = 0, onClickCroquettes: () -> Unit) {
                 tint = Marron, modifier = Modifier.size(20.dp)
             )
             Text(text = croquettes.toString(), modifier = Modifier.padding(horizontal = 8.dp))
-    }
+        }
     }
 }
 
@@ -361,20 +364,19 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
 @Composable
 fun StoreDialog(
     isVisible: Boolean,
-    viewModel: DogListViewModel,
     arrayCroquettes: Array<Int>,
     onDismissRequest: () -> Unit,
     onUnCoverRequest: () -> Unit
 ) {
-    val context = LocalContext.current
 
     if (isVisible) {
-        AlertDialog(onDismissRequest = { onDismissRequest() },
+        AlertDialog(
+            onDismissRequest = { onDismissRequest() },
             title = {
                 TitleDialog(text = stringResource(R.string.dog_store))
             },
             text = {
-                Box{
+                Box {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
 
@@ -384,10 +386,10 @@ fun StoreDialog(
                                 formatArgs = arrayCroquettes
                             ),
                             fontSize = 16.sp, textAlign = TextAlign.Justify,
-                            color = MaterialTheme.colorScheme.inverseSurface
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
 
-                            DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
+                        DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
 
                     }
 
@@ -434,7 +436,8 @@ fun CroquettesDialog(
 ) {
     val context = LocalContext.current
     if (isVisible) {
-        AlertDialog(onDismissRequest = { onDismissRequest() },
+        AlertDialog(
+            onDismissRequest = { onDismissRequest() },
             title = {
                 TitleDialog(text = stringResource(R.string.dog_store))
             },
@@ -445,18 +448,14 @@ fun CroquettesDialog(
                             id = R.string.dog_store_message
                         ),
                         fontSize = 16.sp, textAlign = TextAlign.Justify,
-                        color = if (isSystemInDarkTheme()) {
-                            Color.White
-                        } else {
-                            Color.Black
-                        }
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     if (viewModel.counterAdReward <= MAXADSREWARD) {
                         PlayAdReward {
                             viewModel.onRewardShow(context as Activity)
                         }
-                    }else{
+                    } else {
                         DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
                     }
 

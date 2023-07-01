@@ -35,9 +35,9 @@ class ProfileViewModel @Inject constructor (private val loginRepository: LoginRe
 
     fun logout() {
         viewModelScope.launch {
-
-            loginRepository.logout()
             dataStore.clearCache()
+            loginRepository.logout()
+
         }
 
     }
@@ -48,12 +48,13 @@ class ProfileViewModel @Inject constructor (private val loginRepository: LoginRe
             dataStore.getDogListAndCroquettes().collect(){
                 var count = 0
                 if(it is DogUiState.Success){
+                    croquettes = it.data.croquettes
                     it.data.dogList.map{dog->
                         if(dog.inCollection){
-                            count++
+                            dogCollection =  count++
                         }}
-                     croquettes = it.data.croquettes
-                    dogCollection = count
+
+                    //dogCollection = count
                     }
 
                 }

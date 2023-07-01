@@ -1,6 +1,7 @@
 package com.leandrolcd.doganalyzer.domain.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.Keep
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.data.services.FireStoreService
@@ -37,7 +38,7 @@ interface IFireStoreRepository {
 
     suspend fun setCroquettes(croquettes: Int):Boolean
     suspend fun getDogsByIds(list: List<DogRecognition>): DogUiState<List<Dog>>
-    suspend fun synchronizeNow(uid: String)
+    suspend fun synchronizeNow(uid: String, croquettes: Int)
 }
 @Keep
 class FireStoreRepository @Inject constructor(
@@ -60,10 +61,13 @@ class FireStoreRepository @Inject constructor(
                 is DogUiState.Error -> emit(DogUiState.Error(dogs.message))
                 is DogUiState.Loaded -> emit(DogUiState.Loaded())
                 is DogUiState.Loading -> emit(DogUiState.Loading())
-                is DogUiState.Success -> emit(DogUiState.Success(DogListScreen(croquet, dogs.data)))
+                is DogUiState.Success ->{
+                    Log.d("TAG", "getDogListAndCroquettes: ${dogs.data.count()}")
+                    emit(DogUiState.Success(DogListScreen(croquet, dogs.data)))
+                }
             }
 
-            delay(2000L)
+            delay(500L)
 
         }
     }
@@ -91,6 +95,9 @@ class FireStoreRepository @Inject constructor(
       val resultType = makeNetworkCall {
            connectionChecked()
            dogCollection = if (dogListApp.isEmpty()) {
+               dogListApp.clear()
+               Log.d("TAG", "getDogCollection: ${dogListApp.count()}")
+               dogIdUser.clear()
                withContext(dispatcher){
                    val dogUserDeferred = async { fireStore.getDogListUser() }
                    val allDogDeferred = async { fireStore.getDogListApp() }
@@ -180,11 +187,13 @@ class FireStoreRepository @Inject constructor(
         }
     }
 
-    override suspend fun synchronizeNow(uid: String) {
+    override suspend fun synchronizeNow(uid: String, croquettes: Int) {
 
         withContext(dispatcher) {
             connectionChecked()
+
             val deferred = async {  fireStore.deleteDataUser(uid) }
+
             val list = fireStore.getDogListUser()
             if (dogIdUser.isNotEmpty()) {
                 dogIdUser.map {
@@ -198,18 +207,14 @@ class FireStoreRepository @Inject constructor(
             }
             val delete = deferred.await()
             if(delete){
-                setCroquettes(croquettesCache)
+                setCroquettes(croquettes)
                 context.setZeroAdRewardClick()
-                croquettesCache = 0
                 dogIdUser.addAll(list)
             }
 
         }
 
     }
-
-
-
     private fun getCollectionList(allDogList: List<DogDTO>, userDogList: List<String>): List<Dog> {
         val dog = allDogList.toDogList().map {
             if (userDogList.contains(it.mlId)) {

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -225,7 +226,8 @@ fun DogDialog(
                 ButtonDialog(text = stringResource(id = R.string.cancel)) {
                     onDismissRequest()
                 }
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.surface
         )
     }
 
@@ -257,11 +259,7 @@ fun TitleDialog(text: String) {
 
 @Composable
 fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
-    val color = if(isSystemInDarkTheme()) {
-        Color.White
-    }else{
-        Color.Black
-    }
+
     TextButton(onClick = { onSelectItems(dog) }) {
         Row(Modifier) {
             Row(
@@ -270,13 +268,13 @@ fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
                     .weight(1f)
             ) {
                 Text(text = dog.name,
-                    color = color,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     maxLines = 1,
                     softWrap = true)
             }
             Text(
                 text = "${floor(dog.confidence).toInt()} %",
-                color = color,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .width(70.dp)
                     .padding(end = 8.dp),
@@ -419,7 +417,11 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
                 text = stringResource(R.string.dog_life_expectancy, dog.lifeExpectancy),
             )
             TextTitle(
-                text = stringResource(R.string.dog_race, dog.race)
+                text = stringResource(R.string.dog_race, if (LANGUAGE.isSpanish()) {
+                    dog.raceEs
+                } else {
+                    dog.race
+                })
             )
             if (index == 0) {
                 DogCharacteristics(dog, Modifier)

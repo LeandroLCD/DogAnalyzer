@@ -19,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -87,8 +88,9 @@ class LoginViewModel @Inject constructor(
                     if (error != null && error.contains("credential is already")) {
                         currentUser.delete().addOnSuccessListener {
                             viewModelScope.launch {
+                                val croquettes = fireStore.getCroquettes().first()
                                 uiStatus.value =  repository.authLoginWithGoogle(idToken)
-                                fireStore.synchronizeNow(currentUser.uid)
+                                fireStore.synchronizeNow(currentUser.uid, croquettes)
                                 onNavigate(navHostController)
                             }
                         }
@@ -126,21 +128,20 @@ class LoginViewModel @Inject constructor(
     fun onTryAgain() {
         uiStatus.value = LoginUiState.Loaded()
     }
-
-
     fun onCheckedUserCurrent(navHostController: NavHostController) {
+        userCurrent.value = null
         viewModelScope.launch {
-            repository.getUser()?.let { user ->
-                userCurrent.value = user
+            when (val user = repository.getUser()) {
+                null -> {
+                    userCurrent.value = repository.onSignInAnonymously()
+                }
+                else -> {
+                    userCurrent.value = user
+                }
             }
-            if(userCurrent.value == null){
-                userCurrent.value = repository.onSignInAnonymously()
 
-            }
             if(userCurrent.value != null){
                 dogListNavigate(navHostController)
-            }else{
-                loginNavigate(navHostController)
             }
 
         }
