@@ -2,46 +2,65 @@ package com.leandrolcd.doganalyzer.data.dto
 
 import com.google.firebase.firestore.PropertyName
 
-
 data class DogDTO(
-    @PropertyName("mlId")
+
+
+    @get:PropertyName("mlId") @set:PropertyName("mlId")
     var mlId: String = "",
-    @PropertyName("imageUrl")
-    val imageUrl: String,
-    @PropertyName("name")
-    val name: String ,
-    @PropertyName("race")
-    val race: String ,
-    @PropertyName("raceEs")
-    val raceEs: String ,
-    @PropertyName("temperament")
-    val temperament: String,
-    @PropertyName("temperamentEs")
-    val temperamentEs: String,
-    @PropertyName("lifeExpectancy")
-    val lifeExpectancy: String,
-    @PropertyName("weightMale")
-    val weightMale: String,
-    @PropertyName("weightFemale")
-    val weightFemale: String,
-    @PropertyName("heightMale")
-    val heightMale: String,
-    @PropertyName("heightFemale")
-    val heightFemale: String,
-    @PropertyName("curiosities")
-    val curiosities: String,
-    @PropertyName("weightMaleEs")
-    val weightMaleEs: String,
-    @PropertyName("weightFemaleEs")
-    val weightFemaleEs: String,
-    @PropertyName("heightMaleEs")
-    val heightMaleEs: String,
-    @PropertyName("heightFemaleEs")
-    val heightFemaleEs: String,
-    @PropertyName("curiositiesEs")
-    val curiositiesEs: String,
-    @PropertyName("index")
-    val index: Int,
+
+    @get:PropertyName("imageUrl") @set:PropertyName("imageUrl")
+    var imageUrl: String,
+
+    @get:PropertyName("name") @set:PropertyName("name")
+    var name: String ,
+
+    @get:PropertyName("race") @set:PropertyName("race")
+    var race: String ,
+
+    @get:PropertyName("raceEs") @set:PropertyName("raceEs")
+    var raceEs: String ,
+
+    @get:PropertyName("temperament") @set:PropertyName("temperament")
+    var temperament: String,
+
+    @get:PropertyName("temperamentEs") @set:PropertyName("temperamentEs")
+    var temperamentEs: String,
+
+    @get:PropertyName("lifeExpectancy") @set:PropertyName("lifeExpectancy")
+    var lifeExpectancy: String,
+
+    @get:PropertyName("weightMale") @set:PropertyName("weightMale")
+    var weightMale: String,
+
+    @get:PropertyName("weightFemale") @set:PropertyName("weightFemale")
+    var weightFemale: String,
+
+    @get:PropertyName("heightMale") @set:PropertyName("heightMale")
+    var heightMale: String,
+
+    @get:PropertyName("heightFemale") @set:PropertyName("heightFemale")
+    var heightFemale: String,
+
+    @get:PropertyName("curiosities") @set:PropertyName("curiosities")
+    var curiosities: String,
+
+    @get:PropertyName("weightMaleEs") @set:PropertyName("weightMaleEs")
+    var weightMaleEs: String,
+
+    @get:PropertyName("weightFemaleEs") @set:PropertyName("weightFemaleEs")
+    var weightFemaleEs: String,
+
+    @get:PropertyName("heightMaleEs") @set:PropertyName("heightMaleEs")
+    var heightMaleEs: String,
+
+    @get:PropertyName("heightFemaleEs") @set:PropertyName("heightFemaleEs")
+    var heightFemaleEs: String,
+
+    @get:PropertyName("curiositiesEs") @set:PropertyName("curiositiesEs")
+    var curiositiesEs: String,
+
+    @get:PropertyName("index") @set:PropertyName("index")
+    var index: Int,
 ){
     constructor() : this("", "","", "", "", "", "","","","",
         "","","", "", "", "", "", "", 0 )

@@ -1,7 +1,10 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,37 +12,47 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.leandrolcd.doganalyzer.data.repositoty.IClassifierRepository
-import com.leandrolcd.doganalyzer.domain.IGetDogListUseCase
+import com.leandrolcd.doganalyzer.R
+import com.leandrolcd.doganalyzer.domain.repository.ICameraRepository
+import com.leandrolcd.doganalyzer.domain.repository.IClassifierRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.LoginRepository
 import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
-import com.leandrolcd.doganalyzer.ui.camera.ICameraX
-import com.leandrolcd.doganalyzer.ui.model.*
-import com.leandrolcd.doganalyzer.ui.model.UiStatus.Success
-import com.leandrolcd.doganalyzer.ui.utilits.*
+import com.leandrolcd.doganalyzer.ui.model.DogListScreen
+import com.leandrolcd.doganalyzer.ui.model.DogRecognition
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
+import com.leandrolcd.doganalyzer.utility.getAdRewardClick
+import com.leandrolcd.doganalyzer.utility.getDateAdReward
+import com.leandrolcd.doganalyzer.utility.setAdRewardClick
+import com.leandrolcd.doganalyzer.utility.setDateAdReward
+import com.leandrolcd.doganalyzer.utility.toDay
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.*
+import kotlinx.coroutines.withContext
+import java.util.Calendar
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-@Suppress("ThrowableNotThrown")
 @HiltViewModel
 class DogListViewModel@Inject constructor(
-    cameraX: ICameraX,
+    cameraX: ICameraRepository,
     private val classifierRepository: IClassifierRepository,
-    private val dogUseCase: IGetDogListUseCase,
+    private val repository: IFireStoreRepository,
     private val rewardAdView: RewardAdView,
-    private val contextApp: Context
+    private val loginRepository: LoginRepository,
+    private val contextApp: Context,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     var cameraX = mutableStateOf(cameraX)
         private set
 
-    lateinit var uiStatus: StateFlow<UiStatus<List<Dog>>>
+    var uiStatus by mutableStateOf<DogUiState<DogListScreen>>(DogUiState.Loading())
+        private set
 
-    lateinit var croquettes: StateFlow<Int>
 
     lateinit var navHostController: NavHostController
 
@@ -66,16 +79,17 @@ class DogListViewModel@Inject constructor(
     }
 
     private fun startStatus(){
-        viewModelScope.launch {
+        val userCurrent = loginRepository.getUser()
+        userCurrent?.apply {
+            viewModelScope.launch(dispatcher) {
 
-            uiStatus = dogUseCase().map(::Success)
-                .catch { Error(it) }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), UiStatus.Loading())
-            croquettes =
-                dogUseCase.getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
-
-
+                repository.getDogListAndCroquettes().collect{
+                    Log.d("TAG", "startStatus: $it")
+                    uiStatus = it
+                }
+            }
         }
+
     }
     fun recognizerImage(imageProxy: ImageProxy) {
         viewModelScope.launch {
@@ -84,16 +98,19 @@ class DogListViewModel@Inject constructor(
             imageProxy.close()
         }
     }
-    fun onUnCoverRequest(mlId: String) {
+    fun onUnCoverRequest(mlId: String, croquettes:Int) {
         viewModelScope.launch {
-            dogUseCase.addDogByMlId(mlId, 0)
+            repository.addDogToUser(mlId, croquettes * -1)
+            withContext(Dispatchers.Main){
+                Toast.makeText(contextApp, contextApp.getString(R.string.dog_reward), Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     fun onRewardShow(context: Activity){
         rewardAdView.show(context) {
                     viewModelScope.launch {
-                dogUseCase.setCroquettes(it)
+                repository.setCroquettes(it)
                         context.setAdRewardClick(1)
                         counterAdReward = contextApp.getAdRewardClick()
             }

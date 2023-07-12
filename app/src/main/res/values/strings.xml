@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Dog Analyzer</string>
-    <string name="server_client_id">920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com</string>
     <string name="Title">Dog Analyzer</string>
     <string name="continue_with_login">Continue With</string>
     <string name="forgot">Forgot Password?</string>
@@ -29,28 +28,30 @@
     <string name="forgot_password_title">Forgot Password</string>
     <string name="send">Send</string>
     <string name="show_top_score">Top Score Show</string>
-    <string name="banner_id_release">ca-app-pub-2089536578261112/6373721447</string>
-    <string name="banner_id_debug">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
-    <string name="interstitial_release">ca-app-pub-2089536578261112/3034114376</string>
-    <string name="update_require_es">Para continuar utilizando el Dog Analizer, es necesario instalar la última actualización.</string>
-    <string name="update_require_en">To continue it is required to install the latest update.</string>
+    <string name="update_require">To continue using Dog Analyzer, it is necessary to install the latest update.</string>
     <string name="update">Update</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="account_Es">Cuenta:</string>
-    <string name="account_En">Account:</string>
-    <string name="croquettes_Es">Croquetas:</string>
-    <string name="croquettes_En">Croquettes:</string>
-    <string name="logout_Es">Cerrar Sesión</string>
-    <string name="link_account_En">Link Account</string>
-    <string name="link_account_Es">Vincular Cuenta</string>
+    <string name="account">Account:</string>
+    <string name="croquettes">Croquettes:</string>
+    <string name="link_account">Link Account</string>
     <string name="dog_store">Dog Store</string>
     <string name="uncover">Unlock</string>
-    <string name="store_description_Es">Para despertar este perrito necesitas %1$d croquetas, tus croquetas acumuladas son %2$d.</string>
-    <string name="store_description_En">To wake up this puppy you need %1$d croquettes, your accumulated croquettes are %2$d.</string>
-    <string name="dog_store_message_ES">¡Bienvenido a Dog Store, el lugar ideal para encontrar croquetas que harán que los perros se despierten con entusiasmo! Puedes obtener estas deliciosas croquetas viendo anuncios o escaneando perros.</string>
-    <string name="dog_store_message_En">Welcome to the Dog Store, the place to be for kibble that will get your dogs excited! You can get these delicious kibbles by watching ads or by scanning dogs.</string>
+    <string name="store_description">To wake up this puppy you need %1$d croquettes, your accumulated croquettes are %2$d.</string>
+    <string name="dog_store_message">Welcome to the Dog Store, the place to be for kibble that you can redeem to wake up your dogs! Watch an ad video to get a reward of 3 croquettes.</string>
     <string name="reward_id">ca-app-pub-3940256099942544/5224354917</string>
     <string name="reward_id_release">ca-app-pub-2089536578261112/2486650587</string>
+    <string name="dog_reward">Congratulations</string>
+    <string name="probability">Probability %1$d%%</string>
+    <string name="dog_life_expectancy">%1$s year</string>
+    <string name="dog_race">Race: %1$s</string>
+    <string name="dog_curiosities">Curiosities</string>
+    <string name="dog_characteristics">Characteristics</string>
+    <string name="dog_female">Female</string>
+    <string name="dog_sex">Sex</string>
+    <string name="dog_weigh">Weigh</string>
+    <string name="dog_height">Height</string>
+    <string name="dog_male">Male</string>
+    <string name="connection_off">The device does not have an internet connection.</string>
+    <string name="an_error_google">An error occurred while trying to sign in with google.</string>
 
 </resources>

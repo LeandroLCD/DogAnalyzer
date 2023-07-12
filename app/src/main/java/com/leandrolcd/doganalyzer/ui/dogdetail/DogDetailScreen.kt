@@ -14,6 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,16 +39,23 @@ import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.*
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.ErrorLoginScreen
-import com.leandrolcd.doganalyzer.ui.authentication.utilities.LoadingScreen
+import com.leandrolcd.doganalyzer.ui.auth.ErrorLoginScreen
+import com.leandrolcd.doganalyzer.ui.auth.controls.LoadingScreen
 import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
-import com.leandrolcd.doganalyzer.ui.model.UiStatus
-import com.leandrolcd.doganalyzer.ui.ui.theme.*
-import com.leandrolcd.doganalyzer.ui.utilits.*
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
+import com.leandrolcd.doganalyzer.ui.theme.Purple500
+import com.leandrolcd.doganalyzer.ui.theme.colorGray
+import com.leandrolcd.doganalyzer.ui.theme.primaryColor
+import com.leandrolcd.doganalyzer.ui.theme.textColor
+import com.leandrolcd.doganalyzer.utility.LANGUAGE
+import com.leandrolcd.doganalyzer.utility.isSpanish
+import com.leandrolcd.doganalyzer.utility.setDetailClick
+import com.leandrolcd.doganalyzer.utility.setRecognitionClick
 import kotlin.math.floor
 
+@ExperimentalMaterial3Api
 @ExperimentalCoilApi
 @Composable
 fun DogDetailScreen(
@@ -58,22 +67,22 @@ fun DogDetailScreen(
 
     viewModel.setNavHostController(navController = navController)
     when (val status = viewModel.uiStatus.value) {
-        is UiStatus.Error -> {
-            ErrorLoginScreen(message = (status as UiStatus.Error<*>).message) {
+        is DogUiState.Error -> {
+            ErrorLoginScreen(message = (status as DogUiState.Error<*>).message) {
                 navController.popBackStack()
             }
         }
-        is UiStatus.Loaded -> {
+        is DogUiState.Loaded -> {
             viewModel.getDogsById(dogList)
             val context = LocalContext.current as Activity
             interstitialShow(isRecognition, context) {
                 viewModel.interstitialShow(context)
             }
         }
-        is UiStatus.Loading -> {
+        is DogUiState.Loading -> {
             LoadingScreen(Modifier.fillMaxSize())
         }
-        is UiStatus.Success -> {
+        is DogUiState.Success -> {
             DogContent(navController, isRecognition, dogList.first().id, viewModel)
         }
     }
@@ -148,8 +157,8 @@ fun DogScaffold(
             }
 
 
-        },
-        modifier = Modifier.background(Color.White)
+        }
+
     )
     viewModel.dogStatus.value?.let { dogs ->
         DogDialog(isVisible = isVisible, dogList = dogs,
@@ -217,7 +226,8 @@ fun DogDialog(
                 ButtonDialog(text = stringResource(id = R.string.cancel)) {
                     onDismissRequest()
                 }
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.surface
         )
     }
 
@@ -249,11 +259,7 @@ fun TitleDialog(text: String) {
 
 @Composable
 fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
-    val color = if(isSystemInDarkTheme()) {
-        Color.White
-    }else{
-        Color.Black
-    }
+
     TextButton(onClick = { onSelectItems(dog) }) {
         Row(Modifier) {
             Row(
@@ -262,13 +268,13 @@ fun ItemDogR(dog: Dog, onSelectItems: (Dog) -> Unit) {
                     .weight(1f)
             ) {
                 Text(text = dog.name,
-                    color = color,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     maxLines = 1,
                     softWrap = true)
             }
             Text(
                 text = "${floor(dog.confidence).toInt()} %",
-                color = color,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .width(70.dp)
                     .padding(end = 8.dp),
@@ -325,8 +331,7 @@ fun MyTopAppBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextTitle(
-                        textSp = "Probabilidad $confidence %",
-                        textEn = "Probability $confidence %",
+                        text = stringResource(R.string.probability, confidence),
                         fontSize = 16.sp,
                         color = primaryColor
                     )
@@ -346,7 +351,7 @@ fun MyTopAppBar(
 @Composable
 fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
 
-    val language = LANGUAGE
+
     BottomAppBar(
         modifier = Modifier.background(Color.White),
         backgroundColor = primaryColor,
@@ -357,37 +362,20 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
         BottomNavigationItem(selected = index == 0, onClick = { onClickSelect(0) }, icon = {
             Icon(
                 imageVector = Icons.Outlined.MedicalInformation,
-                contentDescription = if (language.isSpanish()) {
-                    "Caracteristicas"
-                } else {
-                    "Characteristics"
-                }
-            )
-        }, label = {
+                contentDescription = stringResource(id = R.string.dog_characteristics))
+            }, label = {
             Text(
-                text = if (language.isSpanish()) {
-                    "Caracteristicas"
-                } else {
-                    "Characteristics"
-                }
+                text = stringResource(id = R.string.dog_characteristics)
             )
         }, unselectedContentColor = textColor)
         BottomNavigationItem(selected = index == 1, onClick = { onClickSelect(1) }, icon = {
             Icon(
                 imageVector = Icons.Outlined.QuestionMark,
-                contentDescription = if (language.isSpanish()) {
-                    "Curiosidades"
-                } else {
-                    "Curiosities"
-                }
+                contentDescription = stringResource(id = R.string.dog_curiosities)
             )
         }, label = {
             Text(
-                text = if (language.isSpanish()) {
-                    "Curiosidades"
-                } else {
-                    "Curiosities"
-                }
+                text = stringResource(id = R.string.dog_curiosities)
             )
         }, unselectedContentColor = textColor)
     }
@@ -426,12 +414,14 @@ fun DogInformation(dog: Dog, modifier: Modifier, index: Int) {
                     .width(200.dp)
             )
             TextTitle(
-                textEn = "${dog.lifeExpectancy} year",
-                textSp = "${dog.lifeExpectancy} años"
+                text = stringResource(R.string.dog_life_expectancy, dog.lifeExpectancy),
             )
             TextTitle(
-                textEn = "Race: ${dog.race}",
-                textSp = "Raza: ${dog.raceEs}"
+                text = stringResource(R.string.dog_race, if (LANGUAGE.isSpanish()) {
+                    dog.raceEs
+                } else {
+                    dog.race
+                })
             )
             if (index == 0) {
                 DogCharacteristics(dog, Modifier)
@@ -475,8 +465,7 @@ fun DogCuriosities(textEn: String, textSp: String, modifier: Modifier = Modifier
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextTitle(
-                    textSp = "Curiosidades",
-                    textEn = "Curiosities",
+                    text= stringResource(R.string.dog_curiosities),
                     fontSize = 24.sp
                 )
                 Text(
@@ -529,15 +518,17 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 
             ) {
             TextTitle(
-                textSp = "Caracteristicas",
-                textEn = "Characteristics",
+                text = stringResource(R.string.dog_characteristics),
                 fontSize = 24.sp,
                 Modifier.padding(bottom = 8.dp)
             )
-
+            val description = if(LANGUAGE.isSpanish()){
+                dog.temperamentEs
+            }else{
+                dog.temperament
+            }
             TextDescription(
-                textSp = dog.temperamentEs,
-                textEn = dog.temperament,
+                text = description,
                 textAlign = TextAlign.Center
             )
             ColumnDetail(
@@ -556,19 +547,14 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 
 @Composable
 fun TextTitle(
-    textSp: String,
-    textEn: String,
+    text: String,
     fontSize: TextUnit = 16.sp,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
     color: Color = textColor
 ) {
     Text(
-        text = if (LANGUAGE.isSpanish()) {
-            textSp
-        } else {
-            textEn
-        },
+        text = text,
         fontSize = fontSize,
         color = color,
         fontWeight = FontWeight.Medium,
@@ -579,19 +565,14 @@ fun TextTitle(
 
 @Composable
 fun TextDescription(
-    textSp: String,
-    textEn: String,
+    text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
     fontSize: TextUnit = 16.sp,
     color: Color = textColor
 ) {
     Text(
-        text = if (LANGUAGE.isSpanish()) {
-            textSp
-        } else {
-            textEn
-        },
+        text = text,
         fontSize = fontSize,
         color = color,
         textAlign = textAlign,
@@ -678,38 +659,38 @@ fun ColumnDetail(dog: Dog, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         Row(Modifier.padding(top = 16.dp)) {
-            TextTitle(textSp = "Sexo", textEn = "Sex", modifier = Modifier.weight(1f))
-            TextTitle(textSp = "Peso", textEn = "Weigh", modifier = Modifier.weight(1f))
-            TextTitle(textSp = "Altura", textEn = "Height", modifier = Modifier.weight(1f))
+            TextTitle(text = stringResource(R.string.dog_sex), modifier = Modifier.weight(1f))
+            TextTitle(text= stringResource(R.string.dog_weigh), modifier = Modifier.weight(1f))
+            TextTitle(text = stringResource(R.string.dog_height), modifier = Modifier.weight(1f))
         }
         Row() {
             TextTitle(
-                textSp = "Macho", textEn = "Male",
+                text = stringResource(R.string.dog_male),
                 modifier = Modifier.weight(1f)
             )
             TextDescription(
-                textSp = dog.weightMaleEs, textEn = dog.weightMale,
+                text = if(LANGUAGE.isSpanish()) dog.weightMaleEs else dog.weightMale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
             TextDescription(
-                textSp = dog.heightMaleEs, textEn = dog.heightMale,
+                text =if(LANGUAGE.isSpanish()) dog.heightMaleEs else dog.heightMale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
         }
         Row() {
             TextTitle(
-                textSp = "Hembra", textEn = "Female",
+                text= stringResource(R.string.dog_female),
                 modifier = Modifier.weight(1f)
             )
             TextDescription(
-                textSp = dog.weightFemaleEs, textEn = dog.weightFemale,
+                text = if(LANGUAGE.isSpanish()) dog.weightFemaleEs else dog.weightFemale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
             TextDescription(
-                textSp = dog.heightFemaleEs, textEn = dog.heightFemale,
+                text = if(LANGUAGE.isSpanish()) dog.heightFemaleEs else dog.heightFemale,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )

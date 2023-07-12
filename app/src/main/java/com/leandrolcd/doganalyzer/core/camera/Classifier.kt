@@ -1,8 +1,9 @@
 package com.leandrolcd.doganalyzer.core.camera
 
 import android.graphics.Bitmap
-import com.leandrolcd.doganalyzer.ui.utilits.MAX_RECOGNITION_DOG_RESULTS
+import androidx.annotation.Keep
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
+import com.leandrolcd.doganalyzer.utility.MAX_RECOGNITION_DOG_RESULTS
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.DequantizeOp
@@ -12,11 +13,12 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.nio.MappedByteBuffer
-import java.util.*
+import java.util.PriorityQueue
 import javax.inject.Inject
 
+@Keep
 class Classifier @Inject constructor(tfLiteModel: MappedByteBuffer,
-                 private val labels: List<String>) {
+                                     private val labels: List<String>) {
     /**
      * Image size along the x axis.
      */

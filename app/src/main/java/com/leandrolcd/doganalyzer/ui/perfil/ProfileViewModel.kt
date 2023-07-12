@@ -5,64 +5,65 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leandrolcd.doganalyzer.data.repositoty.IFireStoreRepository
-import com.leandrolcd.doganalyzer.data.repositoty.LoginRepository
+import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
+import com.leandrolcd.doganalyzer.domain.repository.LoginRepository
+import com.leandrolcd.doganalyzer.ui.states.DogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class ProfileViewModel @Inject constructor (private val loginRepository: LoginRepository,
-private val dataStore: IFireStoreRepository):ViewModel() {
+                                            private val dataStore: IFireStoreRepository
+):ViewModel() {
 
     var userCurrent by mutableStateOf(loginRepository.getUser())
     private set
 
-   var dogCollection: StateFlow<Int>
+   var dogCollection by mutableStateOf(0)
    private set
-
-    lateinit var croquettes: StateFlow<Int>
+    var croquettes  by mutableStateOf(0)
     private set
 
      init {
 
-         dogCollection =
-             getDogUser().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
-
-         viewModelScope.launch {
-             croquettes =
-                 dataStore.getCroquettes().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
-
-         }
-
-
-
+         getDogUser()
      }
 
     fun logout() {
         viewModelScope.launch {
-            loginRepository.logout()
             dataStore.clearCache()
-            dataStore.getCroquettes().apply {
-                    dataStore.setCroquettes(this.first() *- 1)
-                }
-            }
+            loginRepository.logout()
+
+        }
 
     }
 
-    private fun getDogUser(): Flow<Int> = flow{
+    private fun getDogUser(){
+        viewModelScope.launch(Dispatchers.IO) {
 
-        var count = 0
-        dataStore.getDogCollection().map {
-            if(it.inCollection){
-                count++
-            }}
+            dataStore.getDogListAndCroquettes().collect(){
+                var count = 0
+                if(it is DogUiState.Success){
+                    croquettes = it.data.croquettes
+                    it.data.dogList.map{dog->
+                        if(dog.inCollection){
+                            dogCollection =  count++
+                        }}
 
-              emit(count)
+                    //dogCollection = count
+                    }
+
+                }
+
+
+
         }
+        }
+
 
 
 }

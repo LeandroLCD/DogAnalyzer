@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "920293101468",
+    "project_id": "dogedex-f5d3f",
+    "storage_bucket": "dogedex-f5d3f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920293101468:android:8a38f844da15404d348259",
+        "android_client_info": {
+          "package_name": "com.leandrolcd.doganalyzer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "920293101468-3ssokm0380814geifsvtm7ee835e7iqu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.leandrolcd.doganalyzer",
+            "certificate_hash": "0a154ff20ebf6cf197badcac8de3b08aed2816ba"
+          }
+        },
+        {
+          "client_id": "920293101468-ir65oag79oq38i6lk8j6gdq56r02n421.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.leandrolcd.doganalyzer",
+            "certificate_hash": "b7196462ebbb204e90b7def0435b767b834b46c1"
+          }
+        },
+        {
+          "client_id": "920293101468-l0tpn97rnv2gff3j6g7lioobn6jhbtsd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.leandrolcd.doganalyzer",
+            "certificate_hash": "5af984dedb1766fa2bc8e612a1dbc0666abcd139"
+          }
+        },
+        {
+          "client_id": "920293101468-5f07hsnalp5d0q4apu39ekajjhkqin8a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH-iWRgIx52_785rBCGH9j5Q6afUNKmls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
