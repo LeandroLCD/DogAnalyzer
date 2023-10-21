@@ -2,8 +2,6 @@ package com.leandrolcd.doganalyzer.ui.dogdetail
 
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,10 +35,9 @@ import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.*
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
 import com.leandrolcd.doganalyzer.ui.auth.ErrorLoginScreen
+import com.leandrolcd.doganalyzer.ui.auth.controls.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.auth.controls.LoadingScreen
-import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.states.DogUiState
@@ -51,8 +47,6 @@ import com.leandrolcd.doganalyzer.ui.theme.primaryColor
 import com.leandrolcd.doganalyzer.ui.theme.textColor
 import com.leandrolcd.doganalyzer.utility.LANGUAGE
 import com.leandrolcd.doganalyzer.utility.isSpanish
-import com.leandrolcd.doganalyzer.utility.setDetailClick
-import com.leandrolcd.doganalyzer.utility.setRecognitionClick
 import kotlin.math.floor
 
 @ExperimentalMaterial3Api
@@ -74,10 +68,6 @@ fun DogDetailScreen(
         }
         is DogUiState.Loaded -> {
             viewModel.getDogsById(dogList)
-            val context = LocalContext.current as Activity
-            interstitialShow(isRecognition, context) {
-                viewModel.interstitialShow(context)
-            }
         }
         is DogUiState.Loading -> {
             LoadingScreen(Modifier.fillMaxSize())
@@ -127,7 +117,7 @@ fun DogScaffold(
     var dog by remember {
         mutableStateOf(viewModel.dogStatus.value?.first())
     }
-    val activity = LocalContext.current as Activity
+
     Scaffold(
         topBar = {
             MyTopAppBar(navController, isRecognition, dog!!.confidence.toInt()) {
@@ -163,43 +153,17 @@ fun DogScaffold(
     viewModel.dogStatus.value?.let { dogs ->
         DogDialog(isVisible = isVisible, dogList = dogs,
             onDismissRequest = {
-                val click = activity.setDetailClick()
-                if (click % 5 == 0) {
-                    viewModel.interstitialShow(activity)
-                }
+
                 isVisible = false
             }, onSelectItems = {
                 dog = it
-                val click = activity.setDetailClick()
-                if (click % 5 == 0) {
-                    viewModel.interstitialShow(activity)
-                }
 
                 isVisible = false
             })
     }
 }
 
-fun interstitialShow(
-    isRecognition: Boolean,
-    context: Context,
-    Show: () -> Unit
-) {
 
-    if (isRecognition) {
-        val click = context.setRecognitionClick()
-        if (click % 2 == 0) {
-            Show()
-        }
-    } else {
-        val click = context.setDetailClick()
-        if (click % 5 == 0) {
-            Show()
-        }
-    }
-
-
-}
 
 
 @Composable
@@ -549,7 +513,7 @@ fun DogCharacteristics(dog: Dog, modifier: Modifier = Modifier) {
 fun TextTitle(
     text: String,
     fontSize: TextUnit = 16.sp,
-    modifier: Modifier = Modifier,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
     color: Color = textColor
 ) {
@@ -606,25 +570,10 @@ fun DogDetail(dog: Dog, index: Int) {
             .background(Color.Gray)
             .fillMaxSize()
     ) {
-        val (header, body, banner) = createRefs()
+        val (header, body) = createRefs()
         val topGuide = createGuidelineFromTop(0.35f)
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(Color.Transparent)
-                .constrainAs(banner) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            horizontalArrangement = Arrangement.Center,
 
-            ) {
-            BannerAdView() {}
-
-        }
         Box(modifier = Modifier
             .background(Color.Transparent)
             .fillMaxWidth()

@@ -1,15 +1,12 @@
 package com.leandrolcd.doganalyzer.ui.dogdetail
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.util.Log
 import androidx.annotation.Keep
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.leandrolcd.doganalyzer.domain.repository.IFireStoreRepository
-import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
 import com.leandrolcd.doganalyzer.ui.model.Dog
 import com.leandrolcd.doganalyzer.ui.model.DogRecognition
 import com.leandrolcd.doganalyzer.ui.model.Routes
@@ -21,8 +18,7 @@ import javax.inject.Inject
 @Keep
 @HiltViewModel
 class DogDetailViewModel @Inject constructor(
-    private val repository: IFireStoreRepository,
-    private val interstitialAdMod: InterstitialAdMod
+    private val repository: IFireStoreRepository
 ): ViewModel() {
 
     //region Fields
@@ -71,10 +67,6 @@ class DogDetailViewModel @Inject constructor(
         navHostController = navController
 
     }
-    fun interstitialShow(activity: Activity) {
-        interstitialAdMod.show(activity) {
-            Log.d("TAG", "interstitialShow: ViewModelShow")
-        }
-    }
+
 
 }

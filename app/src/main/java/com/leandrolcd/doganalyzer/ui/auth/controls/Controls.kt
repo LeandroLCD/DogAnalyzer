@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
@@ -50,7 +49,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.leandrolcd.doganalyzer.R
 import com.leandrolcd.doganalyzer.ui.auth.LoginViewModel
 import com.leandrolcd.doganalyzer.ui.dogdetail.TitleDialog
-import com.leandrolcd.doganalyzer.ui.doglist.ButtonDialog
+import com.leandrolcd.doganalyzer.ui.theme.Purple500
 import com.leandrolcd.doganalyzer.ui.theme.backGroupTextField
 import com.leandrolcd.doganalyzer.ui.theme.colorGray
 import com.leandrolcd.doganalyzer.ui.theme.primaryColor
@@ -343,23 +342,7 @@ fun StartScreen(
 
 
 }
-@Composable
-fun TextTitle(
-    text: String,
-    fontSize: TextUnit = 16.sp,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Center,
-    color: Color = textColor
-) {
-    Text(
-        text = text,
-        fontSize = fontSize,
-        color = color,
-        fontWeight = FontWeight.Medium,
-        textAlign = textAlign,
-        modifier = modifier
-    )
-}
+
 @Composable
 fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
     if (isVisible) {
@@ -377,6 +360,7 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
                 )
             },
             confirmButton = {
+                
                 ButtonDialog(text = stringResource(R.string.update)) {
                     onUpdateClicked()
                 }
@@ -385,5 +369,20 @@ fun UpdateDialog(isVisible: Boolean, onUpdateClicked: () -> Unit) {
     }
 
 }
+
+@Composable
+fun ButtonDialog(text: String, onClick: () -> Unit) {
+
+    TextButton(onClick = {
+        onClick()
+    }, colors = androidx.compose.material.ButtonDefaults.buttonColors(Purple500)) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
+}
+
+
 
 

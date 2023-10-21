@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -30,9 +29,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
-import com.leandrolcd.doganalyzer.ui.admob.InterstitialAdMod
-import com.leandrolcd.doganalyzer.ui.admob.RewardAdView
-import com.leandrolcd.doganalyzer.ui.admob.removeInterstitial
 import com.leandrolcd.doganalyzer.ui.auth.LoginScreen
 import com.leandrolcd.doganalyzer.ui.auth.LoginViewModel
 import com.leandrolcd.doganalyzer.ui.auth.SignUpScreen
@@ -46,7 +42,6 @@ import com.leandrolcd.doganalyzer.ui.theme.DogAnalyzerTheme
 import com.leandrolcd.doganalyzer.utility.SERVER_CLIENT_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import javax.inject.Inject
 
 @ExperimentalCoilApi
 @ExperimentalMaterial3Api
@@ -54,11 +49,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var interstitialAdMod: InterstitialAdMod
 
-    @Inject
-    lateinit var rewardAdView: RewardAdView
+
+
 
     lateinit var navigationController: NavHostController
     private val loginViewModel: LoginViewModel by viewModels()
@@ -71,10 +64,6 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        MobileAds.initialize(this) {}
-        interstitialAdMod.load(this)
-        rewardAdView.load(this)
 
         remoteConfig.setConfigSettingsAsync(configSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
@@ -95,7 +84,6 @@ class MainActivity : ComponentActivity() {
         }
     }
     override fun onDestroy() {
-        removeInterstitial()
         super.onDestroy()
     }
 

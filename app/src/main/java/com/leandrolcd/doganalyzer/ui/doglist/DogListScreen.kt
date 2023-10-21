@@ -3,9 +3,7 @@
 package com.leandrolcd.doganalyzer.ui.doglist
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -14,13 +12,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.House
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,17 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.outlined.House
-import androidx.compose.ui.layout.ContentScale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.*
 import com.leandrolcd.doganalyzer.R
-import com.leandrolcd.doganalyzer.ui.admob.BannerAdView
 import com.leandrolcd.doganalyzer.ui.auth.ErrorLoginScreen
 import com.leandrolcd.doganalyzer.ui.auth.controls.LoadingScreen
 import com.leandrolcd.doganalyzer.ui.dogdetail.TextDescription
@@ -51,7 +47,6 @@ import com.leandrolcd.doganalyzer.ui.theme.Marron
 import com.leandrolcd.doganalyzer.ui.theme.Purple500
 import com.leandrolcd.doganalyzer.ui.theme.primaryColor
 import com.leandrolcd.doganalyzer.ui.theme.textColor
-import com.leandrolcd.doganalyzer.utility.MAXADSREWARD
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
@@ -99,6 +94,7 @@ fun DogListScreen(
 
 }
 
+@ExperimentalMaterialApi
 @ExperimentalCoilApi
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalCoroutinesApi
@@ -113,13 +109,10 @@ fun DogListContent(
     var index by remember {
         mutableStateOf(0)
     }
-    var isBanner by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
     var isVisibleStore by remember { mutableStateOf(false) }
     var dogSelect by remember { mutableStateOf<Dog?>(null) }
 
-
-    val context = LocalContext.current
     Scaffold(
         topBar = {
             MyTopBar(croquettes = croquettesCount, onClickCroquettes = { isVisibleStore = true }) {
@@ -158,7 +151,7 @@ fun DogListContent(
             ) {
                 DogCollection(
                     dogList,
-                    modifier = Modifier.padding(bottom = if (isBanner) 50.dp else 0.dp),
+                    modifier = Modifier,
                     onUnCoverRequest = { select ->
                         isVisible = true
                         dogSelect = select
@@ -166,20 +159,7 @@ fun DogListContent(
                 ) { dog ->
                     onItemSelected(dog)
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .height(50.dp)
-                        .background(Color.Transparent),
-                    horizontalArrangement = Arrangement.Center,
 
-                    ) {
-                    BannerAdView {
-                        isBanner = true
-                    }
-
-                }
 
 
             }
@@ -189,26 +169,15 @@ fun DogListContent(
 
         }
 
-        StoreDialog(
-            isVisible = isVisible,
-            onDismissRequest = { isVisible = false },
-            arrayCroquettes = arrayOf(dogSelect?.croquettes ?: 0, croquettesCount)
-        ) {
-            if (dogSelect != null && croquettesCount > (dogSelect?.croquettes ?: 0)) {
-                viewModel.onUnCoverRequest(dogSelect!!.mlId, dogSelect!!.croquettes)
-            } else {
-                Toast.makeText(context, "Insufficient Croquettes", Toast.LENGTH_LONG).show()
-            }
-        }
 
         CroquettesDialog(
             isVisible = isVisibleStore,
-            viewModel = viewModel,
             onDismissRequest = { isVisibleStore = false })
 
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun DogCollection(
     dogList: List<Dog>,
@@ -358,71 +327,7 @@ fun MyBottomBar(index: Int, onClickSelect: (Int) -> Unit) {
 }
 
 
-@ExperimentalCoilApi
-@ExperimentalMaterial3Api
-@ExperimentalCoroutinesApi
-@Composable
-fun StoreDialog(
-    isVisible: Boolean,
-    arrayCroquettes: Array<Int>,
-    onDismissRequest: () -> Unit,
-    onUnCoverRequest: () -> Unit
-) {
 
-    if (isVisible) {
-        AlertDialog(
-            onDismissRequest = { onDismissRequest() },
-            title = {
-                TitleDialog(text = stringResource(R.string.dog_store))
-            },
-            text = {
-                Box {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-
-                        TextDescription(
-                            text = stringResource(
-                                id = R.string.store_description,
-                                formatArgs = arrayCroquettes
-                            ),
-                            fontSize = 16.sp, textAlign = TextAlign.Justify,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-
-                        DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
-
-                    }
-
-                }
-            },
-            confirmButton = {
-                ButtonDialog(
-                    text = stringResource(R.string.uncover)
-                ) {
-                    onUnCoverRequest()
-                    onDismissRequest()
-                }
-
-            },
-            dismissButton = {
-                ButtonDialog(text = stringResource(R.string.cancel)) {
-                    onDismissRequest()
-                }
-            },
-            backgroundColor = MaterialTheme.colorScheme.surface
-        )
-    }
-}
-
-@Composable
-fun ButtonDialog(text: String, onClick: () -> Unit) {
-    val color = Purple500
-    TextButton(onClick = {
-        onClick()
-    }, colors = ButtonDefaults.textButtonColors(contentColor = color)) {
-        Text(text = text, fontWeight = FontWeight.ExtraBold)
-    }
-}
 
 @ExperimentalCoilApi
 @ExperimentalMaterialApi
@@ -431,10 +336,8 @@ fun ButtonDialog(text: String, onClick: () -> Unit) {
 @Composable
 fun CroquettesDialog(
     isVisible: Boolean,
-    viewModel: DogListViewModel,
     onDismissRequest: () -> Unit
 ) {
-    val context = LocalContext.current
     if (isVisible) {
         AlertDialog(
             onDismissRequest = { onDismissRequest() },
@@ -451,13 +354,9 @@ fun CroquettesDialog(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    if (viewModel.counterAdReward <= MAXADSREWARD) {
-                        PlayAdReward {
-                            viewModel.onRewardShow(context as Activity)
-                        }
-                    } else {
+
                         DogAnimation(rawRes = R.raw.dalmata, Modifier.size(100.dp))
-                    }
+
 
                 }
             },
@@ -475,12 +374,4 @@ fun CroquettesDialog(
 
 }
 
-@Composable
-fun PlayAdReward(onRewardRequest: () -> Unit) {
-    Box(
-        Modifier
-            .size(120.dp, 100.dp), contentAlignment = Alignment.Center
-    ) {
-        DogAnimation(rawRes = R.raw.play, Modifier.clickable { onRewardRequest() })
-    }
-}
+
